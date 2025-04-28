@@ -44,8 +44,10 @@ class CLifespan: public Component {
 
 class CBoundingBox: public Component {
   public:
-    Vec2 size     = { 0,0 };
-    Vec2 halfSize = { 0,0 };
+    Vec2                size     = { 0,0 };
+    Vec2                halfSize = { 0,0 };
+    std::vector<int>    height;
+    std::vector<int>    width;
 
     CBoundingBox () {};
     CBoundingBox (float x, float y):

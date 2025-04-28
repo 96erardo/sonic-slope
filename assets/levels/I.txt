@@ -1,38 +1,58 @@
-Tile   Surface0 0  0
-Tile   Surface0 1  0
-Tile   Surface0 2  0
-Tile   Surface0 3  0
-Tile   Surface0 4  0
-Tile   Surface0 5  0
-Tile   Surface0 6  0
-Tile   Surface0 7  0
-Tile   Surface0 8  0
-Tile   Surface0 9  0
-Tile   Stair    10 1
-Tile   Stair    11 1.5
-Tile   Stair    12 2
-Tile   Stair    13 2.5
-Tile   Stair    14 3
-Tile   Stair    15 3.5
-Tile   Stair    16 4
-Tile   Stair    17 4.5
-Tile   Stair    18 5
-Tile   Stair    19 5.5
-Tile   Stair    20 6
-Tile   Stair    21 6.5
-Tile   Surface0 22 6
-Tile   Surface0 23 6
-Tile   Surface0 24 6
-Tile   Surface0 25 6
-Tile   Surface0 26 6
-Tile   Surface0 27 6
-Tile   Surface0 28 6
-Tile   Surface0 29 6
-Tile   Surface0 30 6
-Tile   Surface0 31 6
-Tile   Surface0 32 6
-Tile   Surface0 33 6
-Tile   Surface0 34 6
-Tile   Surface0 35 6
-Tile   Surface0 36 6
-Player          1  1  0.05  0.1  4  0.75
+Tile   Surface0 0   0   1   1
+Tile   Surface8 1   0  -1   1
+Tile   Surface7 2   0  -1   1
+Tile   Surface6 3   0  -1   1
+Tile   Surface6 4   0   1   1
+Tile   Surface7 5   0   1   1
+Tile   Surface8 6   0   1   1
+Tile   Surface0 7   0   1   1
+Tile   Surface0 8   0   1   1
+Tile   Surface0 9   0   1   1
+Tile   Surface0 10  0   1   1
+Tile   Surface0 11  0   1   1
+Tile   Surface0 12  0   1   1
+Tile   Surface0 13  0   1   1
+Tile   Surface0 14  0   1   1
+Tile   Surface0 15  0   1   1
+Tile   Surface0 16  0   1   1
+Tile   Surface0 17  0   1   1
+Tile   Surface0 18  0   1   1
+Tile   Surface0 19  0   1   1
+Tile   Surface0 20  0   1   1
+Tile   Surface0 21  0   1   1
+Tile   Surface0 22  0   1   1
+Tile   Surface0 23  0   1   1
+Tile   Surface0 24  0   1   1
+Tile   Surface0 25  0   1   1
+Tile   Surface0 26  0   1   1
+
+Tile   Surface1 7   1   1   1
+Tile   Surface2 8   1   1   1
+Tile   Surface3 9   1   1   1
+Tile   Surface4 10  1   1   1
+Tile   Surface0 11  1   1   1
+Tile   Surface0 12  1   1   1
+Tile   Surface0 13  1   1   1
+Tile   Surface0 14  1   1   1
+Tile   Surface0 15  1   1   1
+Tile   Surface0 16  1   1   1
+Tile   Surface0 17  1   1   1
+Tile   Surface0 18  1   1   1
+Tile   Surface0 19  1   1   1
+Tile   Surface0 20  1   1   1
+Tile   Surface4 21  1  -1   1
+Tile   Surface3 22  1  -1   1
+Tile   Surface2 23  1  -1   1
+Tile   Surface1 24  1  -1   1
+
+Tile   Surface1 11  2   1   1
+Tile   Surface2 12  2   1   1
+Tile   Surface3 13  2   1   1
+Tile   Surface4 14  2   1   1
+Tile   Surface0 15  2   1   1
+Tile   Surface0 16  2   1   1
+Tile   Surface4 17  2  -1   1
+Tile   Surface3 18  2  -1   1
+Tile   Surface2 19  2  -1   1
+Tile   Surface1 20  2  -1   1
+Player          0  1  0.05  0.1  4  0.75

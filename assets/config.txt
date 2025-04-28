@@ -3,12 +3,28 @@ Texture    TexRun          assets/images/sonic/running.png
 Texture    TexRunFast      assets/images/sonic/running_faster.png
 Texture    TexStop         assets/images/sonic/stopping.png
 Texture    TexJump         assets/images/sonic/jumping.png
-Texture    TexStair        assets/images/env/stair.png
-Texture    TexSurface0     assets/images/env/surface-0.png
-Animation  Stand           TexStand      1     0      32     40
-Animation  Running         TexRun        6     10     32     40
-Animation  RunningFast     TexRunFast    4     8      32     40
-Animation  Stopping        TexStop       1     0      32     40
-Animation  Jumping         TexJump       5     5      24     24
-Animation  Stair           TexStair      1     0      16     8
-Animation  Surface0        TexSurface0   1     0      16     16
+Texture    TexPushing      assets/images/sonic/pushing.png
+Texture    TexSurface0     assets/images/tiles/surface-0.png
+Texture    TexSurface1     assets/images/tiles/surface-1.png
+Texture    TexSurface2     assets/images/tiles/surface-2.png
+Texture    TexSurface3     assets/images/tiles/surface-3.png
+Texture    TexSurface4     assets/images/tiles/surface-4.png
+Texture    TexSurface5     assets/images/tiles/surface-5.png
+Texture    TexSurface6     assets/images/tiles/surface-6.png
+Texture    TexSurface7     assets/images/tiles/surface-7.png
+Texture    TexSurface8     assets/images/tiles/surface-8.png
+Animation  Stand           TexStand      1     0      26     40
+Animation  Running         TexRun        6     10     26     40
+Animation  RunningFast     TexRunFast    4     8      26     40
+Animation  Stopping        TexStop       1     0      26     40
+Animation  Pushing         TexPushing    1     0      26     40
+Animation  Jumping         TexJump       5     5      26     40
+Animation  Surface0        TexSurface0   1     0      32     32
+Animation  Surface1        TexSurface1   1     0      32     32
+Animation  Surface2        TexSurface2   1     0      32     32
+Animation  Surface3        TexSurface3   1     0      32     32
+Animation  Surface4        TexSurface4   1     0      32     32
+Animation  Surface5        TexSurface5   1     0      32     32
+Animation  Surface6        TexSurface6   1     0      32     32
+Animation  Surface7        TexSurface7   1     0      32     32
+Animation  Surface8        TexSurface8   1     0      32     32

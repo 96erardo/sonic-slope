@@ -25,8 +25,11 @@ class Scene_Play: public Scene {
   void spawnHitCoin (Entity* entity);
   
   void sGravity ();
-  void sMovement ();
-  void sCollision ();
+  void sVelocity ();
+  void sMovementX ();
+  void sCollisionX ();
+  void sMovementY ();
+  void sCollisionY ();
   void sLifespan ();
   void sState ();
   void sAnimation ();

@@ -24,33 +24,12 @@ void Scene_Play::init(const std::string& path) {
   std::ifstream file(path);
 
   while (file >> command) {
-    if (command == "Background") {
-      int r, g, b;
-
-      file >> r >> g >> b;
-
-      m_background = sf::Color(r, g, b);
-
-    } else if (command == "Dec") {
+    if (command == "Tile") {
       std::string name;
       float x, y;
+      int scaleX, scaleY;
 
-      file >> name >> x >> y;
-
-      auto entity = m_entities.addEntity("Dec");
-      auto animation = m_game->assets().getAnimation(name);
-
-      entity->addComponent<CAnimation>(*animation);
-      auto transform = entity->addComponent<CTransform>(gridToMidPixel(x, y, entity), Vec2(0,0), 0);
-
-      if (transform.pos.x + (animation->getSize().x / 2) > m_worldWidth) {
-        m_worldWidth = transform.pos.x + (animation->getSize().x / 2);
-      }
-    } else if (command == "Tile") {
-      std::string name;
-      float x, y;
-
-      file >> name >> x >> y;
+      file >> name >> x >> y >> scaleX >> scaleY;
 
       auto entity = m_entities.addEntity("Tile");
       auto animation = m_game->assets().getAnimation(name);
@@ -58,7 +37,30 @@ void Scene_Play::init(const std::string& path) {
       entity->addComponent<CAnimation>(*animation);
       entity->addComponent<CTransform>(gridToMidPixel(x, y, entity), Vec2(0,0), 0);
       entity->addComponent<CBoundingBox>(animation->getBoundingBox().x, animation->getBoundingBox().y);
-    
+
+      entity->getComponent<CTransform>().scale.x = scaleX;
+      entity->getComponent<CTransform>().scale.y = scaleY;
+
+      m_worldWidth = std::max((x * GRID_SIZE) + animation->getSize().x, m_worldWidth);
+
+      std::ifstream info("assets/images/tiles/" + name + ".txt");
+
+      while (info >> command) {
+        if (command == "v") {
+          for (int i = 0; i < 32; i++) {
+            info >> y;
+
+            entity->getComponent<CBoundingBox>().height.push_back(y);
+          }
+        
+        } else if (command == "h") {
+          for (int i = 0; i < 32; i++) {
+            info >> x;
+
+            entity->getComponent<CBoundingBox>().width.push_back(x);
+          }
+        }
+      }
     } else if (command == "Player") {
       file >> m_playerConfig.X 
         >> m_playerConfig.Y 
@@ -133,7 +135,7 @@ void Scene_Play::sGravity () {
   }
 }
 
-void Scene_Play::sMovement () {
+void Scene_Play::sVelocity () {
   m_player->getComponent<CTransform>().prevPos = m_player->getComponent<CTransform>().pos;
 
   if (m_player->getComponent<CInput>().right) {
@@ -221,39 +223,154 @@ void Scene_Play::sMovement () {
   if (m_player->getComponent<CInput>().canJump == false) {
     m_player->getComponent<CState>().state = "Jumping";
   }
-
-  m_player->getComponent<CTransform>().pos += m_player->getComponent<CTransform>().vel;
 }
 
-void Scene_Play::sCollision () {
+void Scene_Play::sMovementX () {
+  m_player->getComponent<CTransform>().pos.x += m_player->getComponent<CTransform>().vel.x;
+
+  if (m_player->getComponent<CTransform>().pos.x - m_player->getComponent<CBoundingBox>().halfSize.x < 0) {
+    m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
+    m_player->getComponent<CTransform>().vel.x = 0;
+    m_player->getComponent<CState>().state = "Pushing";
+  }
+
+  if (m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CBoundingBox>().halfSize.x > m_worldWidth) {
+    m_player->getComponent<CTransform>().pos.x = m_worldWidth - m_player->getComponent<CBoundingBox>().halfSize.x;
+    m_player->getComponent<CTransform>().vel.x = 0;
+    m_player->getComponent<CState>().state = "Pushing";
+  }
+}
+
+void Scene_Play::sCollisionX () {
   for (auto entity : m_entities.getEntities("Tile")) {
-    Vec2 overlap = m_physics.GetOverlap(m_player, entity);
-    bool ovlp = overlap.x > 0 && overlap.y > 0;
+    Vec2 boxOverlap = m_physics.GetOverlap(m_player, entity);
 
-    if (overlap.x > 0 && overlap.y > 0) {
-      Vec2 prevOverlap = m_physics.GetPreviousOverlap(m_player, entity);
+    if (boxOverlap.x > 0 && boxOverlap.y > 0) {
+      float tileBottom = entity->getComponent<CTransform>().pos.y + entity->getComponent<CBoundingBox>().halfSize.y;
+
+      if (m_player->getComponent<CTransform>().vel.x > 0) {
+        // mid right sensor
+        Vec2 mr(
+          m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CBoundingBox>().halfSize.x,
+          m_player->getComponent<CTransform>().pos.y
+        );
+
+        float distance = mr.y - (entity->getComponent<CTransform>().pos.y - entity->getComponent<CBoundingBox>().halfSize.y);
       
-      if (prevOverlap.x > 0) {
-        if (m_player->getComponent<CTransform>().prevPos.y < m_player->getComponent<CTransform>().pos.y) {
-          m_player->getComponent<CTransform>().pos.y -= overlap.y;
-          m_player->getComponent<CTransform>().vel.y = 0;
-          m_player->getComponent<CInput>().canJump = true;
+        if (distance > 0 && distance < entity->getComponent<CBoundingBox>().size.y) {
+          float pixelXOverlap = entity->getComponent<CBoundingBox>().width[floor(distance)] - abs(mr.x - (entity->getComponent<CTransform>().pos.x + entity->getComponent<CBoundingBox>().halfSize.x));
 
-        } else {
-          m_player->getComponent<CTransform>().pos.y += overlap.y;
-          m_player->getComponent<CTransform>().vel.y = 0;
+          if (pixelXOverlap > 0) {
+            m_player->getComponent<CTransform>().pos.x -= pixelXOverlap;
+            m_player->getComponent<CTransform>().vel.x = 0;
+            m_player->getComponent<CState>().state = "Pushing";
+          }
         }
+      
+      } else if (m_player->getComponent<CTransform>().vel.x < 0) {
+        // mid left sensor
+        Vec2 ml(
+          m_player->getComponent<CTransform>().pos.x - m_player->getComponent<CBoundingBox>().halfSize.x,
+          m_player->getComponent<CTransform>().pos.y
+        );
 
-      } else if (prevOverlap.y > 0) {
-        if (entity->getComponent<CAnimation>().animation.getName() == "Stair") {
-          m_player->getComponent<CTransform>().pos.y -= overlap.y;
+        float distance =  ml.y - (entity->getComponent<CTransform>().pos.y - entity->getComponent<CBoundingBox>().halfSize.y);
+      
+        if (distance > 0 && distance <= entity->getComponent<CBoundingBox>().size.y) {
+          float pixelXOverlap = entity->getComponent<CBoundingBox>().width[floor(distance)] - abs(ml.x - (entity->getComponent<CTransform>().pos.x - entity->getComponent<CBoundingBox>().halfSize.x));
 
-        } else {
-          if (m_player->getComponent<CTransform>().prevPos.x < m_player->getComponent<CTransform>().pos.x) {
-            m_player->getComponent<CTransform>().pos.x -= overlap.x;
+          if (pixelXOverlap > 0) {
+            m_player->getComponent<CTransform>().pos.x += pixelXOverlap;
+            m_player->getComponent<CTransform>().vel.x = 0;
+            m_player->getComponent<CState>().state = "Pushing";
+          }
+        }
+      }
+
+      if (m_player->getComponent<CTransform>().vel.y > 0) {
+        //bottom right sensor
+        Vec2 br(
+          m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CBoundingBox>().halfSize.x,
+          m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CBoundingBox>().halfSize.y
+        );
+
+        float rDistance = br.x - (entity->getComponent<CTransform>().pos.x - entity->getComponent<CBoundingBox>().halfSize.x);
+
+        // bottom right sensor check
+        if (rDistance > 0 && rDistance < entity->getComponent<CBoundingBox>().size.x) {
+          float pixelYOverlap = entity->getComponent<CBoundingBox>().height[floor(rDistance)] - (tileBottom - br.y);
+            
+          if (pixelYOverlap > 0 && pixelYOverlap <= entity->getComponent<CBoundingBox>().height[floor(rDistance)]) {
+            m_player->getComponent<CTransform>().pos.y -= pixelYOverlap;
+          }
+        }
           
-          } else {
-            m_player->getComponent<CTransform>().pos.x += overlap.x;
+        // bottom left sensor
+        Vec2 bl(
+          m_player->getComponent<CTransform>().pos.x - m_player->getComponent<CBoundingBox>().halfSize.x,
+          m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CBoundingBox>().halfSize.y
+        );
+        
+        float lDistance = (entity->getComponent<CTransform>().pos.x + entity->getComponent<CBoundingBox>().halfSize.x) - bl.x;
+        
+        if (lDistance > 0 && lDistance < entity->getComponent<CBoundingBox>().size.x) {
+          float pixelYOverlap = entity->getComponent<CBoundingBox>().height[floor(lDistance)] - (tileBottom - bl.y);
+            
+          if (pixelYOverlap > 0 && pixelYOverlap <= entity->getComponent<CBoundingBox>().height[floor(lDistance)]) {
+            m_player->getComponent<CTransform>().pos.y -= pixelYOverlap;
+          }
+        }
+      }
+    }
+  }
+}
+
+void Scene_Play::sMovementY () {
+  m_player->getComponent<CTransform>().pos.y += m_player->getComponent<CTransform>().vel.y;
+}
+
+void Scene_Play::sCollisionY () {
+  for (auto entity : m_entities.getEntities("Tile")) {
+    Vec2 boxOverlap = m_physics.GetOverlap(m_player, entity);
+
+    if (boxOverlap.x > 0 && boxOverlap.y > 0) {
+      float tileBottom = entity->getComponent<CTransform>().pos.y + entity->getComponent<CBoundingBox>().halfSize.y;
+      float pixelYOverlap = 0;
+
+      if (m_player->getComponent<CTransform>().vel.y > 0) {        
+        //bottom right sensor
+        Vec2 br(
+          m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CBoundingBox>().halfSize.x,
+          m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CBoundingBox>().halfSize.y
+        );
+
+        float rDistance = br.x - (entity->getComponent<CTransform>().pos.x - entity->getComponent<CBoundingBox>().halfSize.x);
+
+        if (rDistance > 0 && rDistance < entity->getComponent<CBoundingBox>().size.x) {
+          pixelYOverlap = entity->getComponent<CBoundingBox>().height[floorf(rDistance)] - (tileBottom - br.y);
+          
+          if (pixelYOverlap > 0 && pixelYOverlap < entity->getComponent<CBoundingBox>().height[floorf(rDistance)]) {
+            m_player->getComponent<CTransform>().pos.y -= pixelYOverlap;
+            m_player->getComponent<CTransform>().vel.y = 0;
+            m_player->getComponent<CInput>().canJump = true;
+          }
+        }
+        
+        // bottom left sensor
+        Vec2 bl(
+          m_player->getComponent<CTransform>().pos.x - m_player->getComponent<CBoundingBox>().halfSize.x,
+          m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CBoundingBox>().halfSize.y
+        );
+
+        float lDistance = (entity->getComponent<CTransform>().pos.x + entity->getComponent<CBoundingBox>().halfSize.x) - bl.x;
+        
+        if (lDistance > 0 && lDistance < entity->getComponent<CBoundingBox>().size.x) {
+          pixelYOverlap = entity->getComponent<CBoundingBox>().height[floor(lDistance)] - (tileBottom - bl.y);
+          
+          if (pixelYOverlap > 0 && pixelYOverlap < entity->getComponent<CBoundingBox>().height[floor(lDistance)]) {
+            m_player->getComponent<CTransform>().pos.y -= pixelYOverlap;
+            m_player->getComponent<CTransform>().vel.y = 0;
+            m_player->getComponent<CInput>().canJump = true;
           }
         }
       }
@@ -302,6 +419,20 @@ void Scene_Play::sAnimation () {
 
 void Scene_Play::sRender () {
   m_game->window().clear(sf::Color::White);
+  
+  float x = std::min(
+    m_worldWidth - WINDOW_WIDTH / 2,
+    std::max(
+      (float) WINDOW_WIDTH / 2,
+      m_player->getComponent<CTransform>().pos.x
+    )
+  );
+
+  float y = std::min((float) WINDOW_HEIGHT / 2, m_player->getComponent<CTransform>().pos.y);
+
+  sf::View view = m_game->window().getDefaultView();  
+  view.setCenter({x,y});
+  m_game->window().setView(view);
 
   for (auto entity : m_entities.getEntities()) {
     m_game->window().draw(entity->getComponent<CAnimation>().animation.getSprite());
@@ -314,8 +445,11 @@ void Scene_Play::update () {
   m_entities.update();
 
   sGravity();
-  sMovement();
-  sCollision();
+  sVelocity();
+  sMovementX();
+  sCollisionX();
+  sMovementY();
+  sCollisionY();
   sState();
   sAnimation();
   sRender();
