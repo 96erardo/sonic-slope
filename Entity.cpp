@@ -2,7 +2,7 @@
 #include "Entity.h"
 
 Entity::Entity (size_t id, const std::string& tag): m_id(id), m_tag(tag) {
-  m_components = std::make_tuple(CTransform(), CBoundingBox(), CGravity(), CLifespan(), CInput(), CAnimation(), CState());
+  m_components = std::make_tuple(CTransform(), CBoundingBox(), CCollisionSensor(), CGravity(), CLifespan(), CInput(), CAnimation(), CState());
 };
   
 size_t Entity::id () const {

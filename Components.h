@@ -55,6 +55,17 @@ class CBoundingBox: public Component {
       halfSize(x / 2, y / 2) {};
 };
 
+class CCollisionSensor: public Component {
+
+  public:
+    std::vector<Vec2>  up;
+    std::vector<Vec2>  down;
+    Vec2  left;
+    Vec2  right;
+
+    CCollisionSensor () {};
+};
+
 class CInput: public Component {
   public:
     bool left = false;

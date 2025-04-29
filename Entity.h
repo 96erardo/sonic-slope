@@ -7,6 +7,7 @@
 typedef std::tuple<
   CTransform,
   CBoundingBox,
+  CCollisionSensor,
   CGravity,
   CLifespan,
   CInput,
