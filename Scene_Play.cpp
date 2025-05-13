@@ -26,7 +26,7 @@ void Scene_Play::init(const std::string& path) {
   while (file >> command) {
     if (command == "Tile") {
       std::string name;
-      float x, y;
+      float x, y, a;
       int scaleX, scaleY;
 
       file >> name >> x >> y >> scaleX >> scaleY;
@@ -46,7 +46,11 @@ void Scene_Play::init(const std::string& path) {
       std::ifstream info("assets/images/tiles/" + name + ".txt");
 
       while (info >> command) {
-        if (command == "v") {
+        if (command == "a") {
+          info >> a;
+          entity->getComponent<CBoundingBox>().angle = a;
+
+        } else if (command == "v") {
           for (int i = 0; i < 32; i++) {
             info >> y;
 
@@ -192,16 +196,16 @@ void Scene_Play::sVelocity () {
     m_player->getComponent<CState>().state = "Running";
     
     if (m_player->getComponent<CTransform>().vel.x > 0) {
-      m_player->getComponent<CTransform>().vel.x = std::min(
-        m_playerConfig.MAXSPEED,
+      m_player->getComponent<CTransform>().vel.x = std::max(
+        -m_playerConfig.MAXSPEED,
         m_player->getComponent<CTransform>().vel.x - m_playerConfig.DEC
       );
 
       m_player->getComponent<CState>().state = "Stopping";
 
     } else {
-      m_player->getComponent<CTransform>().vel.x = std::min(
-        m_playerConfig.MAXSPEED,
+      m_player->getComponent<CTransform>().vel.x = std::max(
+        -m_playerConfig.MAXSPEED,
         m_player->getComponent<CTransform>().vel.x - m_playerConfig.ACC
       );
 
@@ -299,6 +303,7 @@ void Scene_Play::sCollisionX () {
 
           if (overlap > 0) {
             m_player->getComponent<CTransform>().pos.y -= overlap;
+            m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
           }
         }
       }
@@ -324,6 +329,21 @@ void Scene_Play::sCollisionY () {
             m_player->getComponent<CTransform>().pos.y -= overlap;
             m_player->getComponent<CTransform>().vel.y = 0;
             m_player->getComponent<CInput>().canJump = true;
+            if (m_player->getComponent<CTransform>().scale.x == 1) {
+              if (entity->getComponent<CTransform>().scale.x == 1) {
+                m_player->getComponent<CTransform>().angle = -entity->getComponent<CBoundingBox>().angle;
+              
+              } else {
+                m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
+              }
+            } else if (m_player->getComponent<CTransform>().scale.x == -1) {
+              if (entity->getComponent<CTransform>().scale.x == 1) {
+                m_player->getComponent<CTransform>().angle = -entity->getComponent<CBoundingBox>().angle;
+              
+              } else {
+                m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
+              }
+            }
           }
         }
       } else if (m_player->getComponent<CTransform>().vel.y < 0) {
@@ -373,6 +393,10 @@ void Scene_Play::sAnimation () {
         entity->getComponent<CTransform>().scale.x,
         entity->getComponent<CTransform>().scale.y  
       });
+
+      entity->getComponent<CAnimation>().animation.getSprite().setRotation(
+        sf::degrees(entity->getComponent<CTransform>().angle)
+      );
     }
 
     if (entity->getComponent<CAnimation>().animation.hasEnded()) {

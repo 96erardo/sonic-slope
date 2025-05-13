@@ -13,6 +13,14 @@ Texture    TexSurface5     assets/images/tiles/surface-5.png
 Texture    TexSurface6     assets/images/tiles/surface-6.png
 Texture    TexSurface7     assets/images/tiles/surface-7.png
 Texture    TexSurface8     assets/images/tiles/surface-8.png
+Texture    TexSurface9     assets/images/tiles/surface-9.png
+Texture    TexSurface10    assets/images/tiles/surface-10.png
+Texture    TexSurface11    assets/images/tiles/surface-11.png
+Texture    TexSurface12    assets/images/tiles/surface-12.png
+Texture    TexSurface13    assets/images/tiles/surface-13.png
+Texture    TexSurface14    assets/images/tiles/surface-14.png
+Texture    TexSurface15    assets/images/tiles/surface-15.png
+Texture    TexSurface16    assets/images/tiles/surface-16.png
 Animation  Stand           TexStand      1     0      26     40
 Animation  Running         TexRun        6     10     26     40
 Animation  RunningFast     TexRunFast    4     8      26     40
@@ -28,3 +36,11 @@ Animation  Surface5        TexSurface5   1     0      32     32
 Animation  Surface6        TexSurface6   1     0      32     32
 Animation  Surface7        TexSurface7   1     0      32     32
 Animation  Surface8        TexSurface8   1     0      32     32
+Animation  Surface9        TexSurface9   1     0      32     32
+Animation  Surface10       TexSurface10  1     0      32     32
+Animation  Surface11       TexSurface11  1     0      32     32
+Animation  Surface12       TexSurface12  1     0      32     32
+Animation  Surface13       TexSurface13  1     0      32     32
+Animation  Surface14       TexSurface14  1     0      32     32
+Animation  Surface15       TexSurface15  1     0      32     32
+Animation  Surface16       TexSurface16  1     0      32     32

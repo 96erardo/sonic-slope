@@ -1,10 +1,10 @@
 Tile   Surface0 0   0   1   1
-Tile   Surface0 1   0   1   1
-Tile   Surface0 2   0   1   1
-Tile   Surface0 3   0   1   1
-Tile   Surface0 4   0   1   1
-Tile   Surface0 5   0   1   1
-Tile   Surface0 6   0   1   1
+Tile   Surface8 1   0  -1   1
+Tile   Surface7 2   0  -1   1
+Tile   Surface6 3   0  -1   1
+Tile   Surface6 4   0   1   1
+Tile   Surface7 5   0   1   1
+Tile   Surface8 6   0   1   1
 Tile   Surface0 7   0   1   1
 Tile   Surface0 8   0   1   1
 Tile   Surface0 9   0   1   1
@@ -62,5 +62,56 @@ Tile   Surface4  17  2  -1   1
 Tile   Surface3  18  2  -1   1
 Tile   Surface2  19  2  -1   1
 Tile   Surface1  20  2  -1   1
+
+Tile   Surface1  21  3   1  -1
+Tile   Surface2  22  3   1  -1
+Tile   Surface3  23  3   1  -1
+Tile   Surface4  24  3   1  -1
+Tile   Surface0  25  3   1  -1
+Tile   Surface0  26  3   1  -1
+
+Tile   Surface1  17  4   1  -1
+Tile   Surface2  18  4   1  -1
+Tile   Surface3  19  4   1  -1
+Tile   Surface4  20  4   1  -1
+Tile   Surface0  21  4   1  -1
+Tile   Surface0  22  4   1  -1
+Tile   Surface0  23  4   1  -1
+Tile   Surface0  24  4   1  -1
+Tile   Surface0  25  4   1  -1
+Tile   Surface0  26  4   1  -1
+
+Tile   Surface0  17  5   1  -1
+Tile   Surface0  18  5   1  -1
+Tile   Surface0  19  5   1  -1
+Tile   Surface0  20  5   1  -1
+Tile   Surface0  21  5   1  -1
+Tile   Surface0  22  5   1  -1
+Tile   Surface0  23  5   1  -1
+Tile   Surface0  24  5   1  -1
+Tile   Surface0  25  5   1  -1
+Tile   Surface0  26  5   1  -1
+
+Tile   Surface0  17  6   1  -1
+Tile   Surface0  18  6   1  -1
+Tile   Surface0  19  6   1  -1
+Tile   Surface0  20  6   1  -1
+Tile   Surface0  21  6   1  -1
+Tile   Surface0  22  6   1  -1
+Tile   Surface0  23  6   1  -1
+Tile   Surface0  24  6   1  -1
+Tile   Surface0  25  6   1  -1
+Tile   Surface0  26  6   1  -1
+
+Tile   Surface0 17  7   1  -1
+Tile   Surface0 18  7   1  -1
+Tile   Surface0 19  7   1  -1
+Tile   Surface0 20  7   1  -1
+Tile   Surface0 21  7   1  -1
+Tile   Surface0 22  7   1  -1
+Tile   Surface0 23  7   1  -1
+Tile   Surface0 24  7   1  -1
+Tile   Surface0 25  7   1  -1
+Tile   Surface0 26  7   1  -1
 
 Player          0  1  0.05  0.1  4  0.75
