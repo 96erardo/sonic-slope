@@ -21,6 +21,7 @@ Texture    TexSurface13    assets/images/tiles/surface-13.png
 Texture    TexSurface14    assets/images/tiles/surface-14.png
 Texture    TexSurface15    assets/images/tiles/surface-15.png
 Texture    TexSurface16    assets/images/tiles/surface-16.png
+Texture    TexSurface17    assets/images/tiles/surface-17.png
 Animation  Stand           TexStand      1     0      26     40
 Animation  Running         TexRun        6     10     26     40
 Animation  RunningFast     TexRunFast    4     8      26     40
@@ -44,3 +45,4 @@ Animation  Surface13       TexSurface13  1     0      32     32
 Animation  Surface14       TexSurface14  1     0      32     32
 Animation  Surface15       TexSurface15  1     0      32     32
 Animation  Surface16       TexSurface16  1     0      32     32
+Animation  Surface17       TexSurface17  1     0      32     32

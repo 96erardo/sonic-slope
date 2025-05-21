@@ -1,6 +1,15 @@
 #include "Physics.h"
 #include "Components.h"
 
+bool Physics::areColliding (Entity* a, Entity* b) const {
+  return (
+    (a->getComponent<CTransform>().pos.x - a->getComponent<CBoundingBox>().halfSize.x) < (b->getComponent<CTransform>().pos.x + b->getComponent<CBoundingBox>().halfSize.x) &&
+    (b->getComponent<CTransform>().pos.x - b->getComponent<CBoundingBox>().halfSize.x) < (a->getComponent<CTransform>().pos.x + a->getComponent<CBoundingBox>().halfSize.x) &&
+    (a->getComponent<CTransform>().pos.y - a->getComponent<CBoundingBox>().halfSize.y) < (b->getComponent<CTransform>().pos.y + b->getComponent<CBoundingBox>().halfSize.y) &&
+    (b->getComponent<CTransform>().pos.y - b->getComponent<CBoundingBox>().halfSize.y) < (a->getComponent<CTransform>().pos.y + a->getComponent<CBoundingBox>().halfSize.y)
+  );
+}
+
 Vec2 Physics::GetOverlap (Entity* a, Entity* b) const {
   float dx = abs(a->getComponent<CTransform>().pos.x - b->getComponent<CTransform>().pos.x);
   float dy = abs(a->getComponent<CTransform>().pos.y - b->getComponent<CTransform>().pos.y);
@@ -17,15 +26,6 @@ Vec2 Physics::GetPreviousOverlap (Entity* a, Entity* b) const {
   float yo = a->getComponent<CBoundingBox>().halfSize.y + b->getComponent<CBoundingBox>().halfSize.y;
   
   return Vec2(xo - dx, yo - dy);
-}
-
-bool Physics::areColliding (Entity* a, Entity* b) const {
-  return (
-    (a->getComponent<CTransform>().pos.x - a->getComponent<CBoundingBox>().halfSize.x) < (b->getComponent<CTransform>().pos.x + b->getComponent<CBoundingBox>().halfSize.x) &&
-    (b->getComponent<CTransform>().pos.x - b->getComponent<CBoundingBox>().halfSize.x) < (a->getComponent<CTransform>().pos.x + a->getComponent<CBoundingBox>().halfSize.x) &&
-    (a->getComponent<CTransform>().pos.y - a->getComponent<CBoundingBox>().halfSize.y) < (b->getComponent<CTransform>().pos.y + b->getComponent<CBoundingBox>().halfSize.y) &&
-    (b->getComponent<CTransform>().pos.y - b->getComponent<CBoundingBox>().halfSize.y) < (a->getComponent<CTransform>().pos.y + a->getComponent<CBoundingBox>().halfSize.y)
-  );
 }
 
 float Physics::GetLeftSensorOverlap (const Vec2& sensor, Entity* tile) const {
@@ -46,7 +46,7 @@ float Physics::GetLeftSensorOverlap (const Vec2& sensor, Entity* tile) const {
     if (tile->getComponent<CBoundingBox>().width[index] > 0) {
       float overlap = (tile->getComponent<CTransform>().pos.x + tile->getComponent<CBoundingBox>().halfSize.x) - sensor.x;
     
-      if (overlap > 0 && overlap <= tile->getComponent<CBoundingBox>().size.x) {
+      if (overlap > 0 && overlap <= tile->getComponent<CBoundingBox>().size.x && overlap < tile->getComponent<CBoundingBox>().width[index]) {
         return overlap;
       } else {
         return 0;

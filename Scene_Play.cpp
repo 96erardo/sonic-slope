@@ -2,6 +2,7 @@
 #include <fstream>
 #include <algorithm>
 #include "Vec2.h"
+#include "utils.h"
 #include "Action.h"
 #include "Entity.h"
 #include "constants.h"
@@ -26,7 +27,8 @@ void Scene_Play::init(const std::string& path) {
   while (file >> command) {
     if (command == "Tile") {
       std::string name;
-      float x, y, a;
+      unsigned int x, y;
+      float a;
       int scaleX, scaleY;
 
       file >> name >> x >> y >> scaleX >> scaleY;
@@ -41,6 +43,7 @@ void Scene_Play::init(const std::string& path) {
       entity->getComponent<CTransform>().scale.x = scaleX;
       entity->getComponent<CTransform>().scale.y = scaleY;
 
+      m_worldMap.insert_or_assign(genKey(x,y), entity);
       m_worldWidth = std::max((x * GRID_SIZE) + animation->getSize().x, m_worldWidth);
 
       std::ifstream info("assets/images/tiles/" + name + ".txt");
@@ -89,12 +92,12 @@ void Scene_Play::spawnPlayer () {
   entity->addComponent<CBoundingBox>(animation->getBoundingBox().x, animation->getBoundingBox().y);
   entity->addComponent<CCollisionSensor>();
   entity->addComponent<CState>("Stand");
-  
+
   // bottom right
   entity->getComponent<CCollisionSensor>().down.push_back(
     Vec2(entity->getComponent<CBoundingBox>().halfSize.x, entity->getComponent<CBoundingBox>().halfSize.y)
   );
-
+  
   // bottom left
   entity->getComponent<CCollisionSensor>().down.push_back(
     Vec2(-entity->getComponent<CBoundingBox>().halfSize.x, entity->getComponent<CBoundingBox>().halfSize.y)
@@ -272,38 +275,67 @@ void Scene_Play::sMovementX () {
 }
 
 void Scene_Play::sCollisionX () {
-  for (auto entity : m_entities.getEntities("Tile")) {
-    if (m_physics.areColliding(m_player, entity)) {
-      if (m_player->getComponent<CTransform>().vel.x > 0) {
-        // mid right sensor
-        Vec2 mr = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().right;
-        float overlap = m_physics.GetRightSensorOverlap(mr, entity);
+  Vec2 pos = pixelToGridPosition(m_player->getComponent<CTransform>().pos);
 
-        if (overlap > 0) {
-          m_player->getComponent<CTransform>().pos.x -= overlap;
-          m_player->getComponent<CTransform>().vel.x = 0;
-          m_player->getComponent<CState>().state = "Pushing";
-        }
-      } else if (m_player->getComponent<CTransform>().vel.x < 0) {
-        // mid left sensor
-        Vec2 ml = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().left;
-        float overlap = m_physics.GetLeftSensorOverlap(ml, entity);
+  for (int x = -1; x <= 1; x++) {
+    for (int y = -1; y <= 1; y++) {
+      Vec2 tilePos = pos + Vec2(x,y);
 
-        if (overlap > 0) {
-          m_player->getComponent<CTransform>().pos.x += overlap;
-          m_player->getComponent<CTransform>().vel.x = 0;
-          m_player->getComponent<CState>().state = "Pushing";
-        }
-      }
+      unsigned int key = genKey(tilePos.x, tilePos.y);
 
-      if (m_player->getComponent<CTransform>().vel.y > 0) {
-        for (auto& bottom : m_player->getComponent<CCollisionSensor>().down) {
-          Vec2 sensor   = m_player->getComponent<CTransform>().pos + bottom;
-          float overlap = m_physics.GetBottomSensorOverlap(sensor, entity);
+      if (m_worldMap.find(key) != m_worldMap.end()) {
+        auto entity = m_worldMap.at(key);
 
-          if (overlap > 0) {
-            m_player->getComponent<CTransform>().pos.y -= overlap;
-            m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
+        if (m_physics.areColliding(m_player, entity)) {
+          if (m_player->getComponent<CTransform>().vel.x > 0) {
+            // mid right sensor
+            Vec2 mr = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().right;
+            float overlap = m_physics.GetRightSensorOverlap(mr, entity);
+  
+            if (overlap > 0) {
+              m_player->getComponent<CTransform>().pos.x -= overlap;
+              m_player->getComponent<CTransform>().vel.x = 0;
+              m_player->getComponent<CState>().state = "Pushing";
+            }
+          } else if (m_player->getComponent<CTransform>().vel.x < 0) {
+            // mid left sensor
+            Vec2 ml = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().left;
+            float overlap = m_physics.GetLeftSensorOverlap(ml, entity);
+  
+            if (overlap > 0) {
+              m_player->getComponent<CTransform>().pos.x += overlap;
+              m_player->getComponent<CTransform>().vel.x = 0;
+              m_player->getComponent<CState>().state = "Pushing";
+            }
+          }
+  
+          if (m_player->getComponent<CTransform>().vel.y > 0) {
+            // if (m_player->getComponent<CTransform>().scale.x == 1) {
+            //   std::sort(
+            //     m_player->getComponent<CCollisionSensor>().down.begin(),
+            //     m_player->getComponent<CCollisionSensor>().down.end(),
+            //     [](Vec2 a, Vec2 b) {
+            //       return a.x < b.x;
+            //     }
+            //   );
+            // } else {
+            //   std::sort(
+            //     m_player->getComponent<CCollisionSensor>().down.begin(),
+            //     m_player->getComponent<CCollisionSensor>().down.end(),
+            //     [](Vec2 a, Vec2 b) {
+            //       return a.x > b.x;
+            //     }
+            //   );
+            // }
+            for (auto& bottom : m_player->getComponent<CCollisionSensor>().down) {
+              Vec2 sensor   = m_player->getComponent<CTransform>().pos + bottom;
+              float overlap = m_physics.GetBottomSensorOverlap(sensor, entity);
+  
+              if (overlap > 0) {
+                m_player->getComponent<CTransform>().pos.y -= overlap;
+                m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
+              }
+            }
           }
         }
       }
@@ -316,45 +348,55 @@ void Scene_Play::sMovementY () {
 }
 
 void Scene_Play::sCollisionY () {
-  for (auto entity : m_entities.getEntities("Tile")) {
-    Vec2 boxOverlap = m_physics.GetOverlap(m_player, entity);
+  Vec2 pos = pixelToGridPosition(m_player->getComponent<CTransform>().pos);
 
-    if (boxOverlap.x > 0 && boxOverlap.y > 0) {
-      if (m_player->getComponent<CTransform>().vel.y > 0) {
-        for (auto& bottom : m_player->getComponent<CCollisionSensor>().down) {
-          Vec2 sensor   = m_player->getComponent<CTransform>().pos + bottom;
-          float overlap = m_physics.GetBottomSensorOverlap(sensor, entity);
+  for (int x = -1; x <= 1; x++) {
+    for (int y = -1; y <= 1; y++) {
+      Vec2 tilePos = pos + Vec2(x,y);
 
-          if (overlap > 0) {
-            m_player->getComponent<CTransform>().pos.y -= overlap;
-            m_player->getComponent<CTransform>().vel.y = 0;
-            m_player->getComponent<CInput>().canJump = true;
-            if (m_player->getComponent<CTransform>().scale.x == 1) {
-              if (entity->getComponent<CTransform>().scale.x == 1) {
-                m_player->getComponent<CTransform>().angle = -entity->getComponent<CBoundingBox>().angle;
-              
-              } else {
-                m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
-              }
-            } else if (m_player->getComponent<CTransform>().scale.x == -1) {
-              if (entity->getComponent<CTransform>().scale.x == 1) {
-                m_player->getComponent<CTransform>().angle = -entity->getComponent<CBoundingBox>().angle;
-              
-              } else {
-                m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
+      unsigned int key = genKey(tilePos.x, tilePos.y);
+
+      if (m_worldMap.find(key) != m_worldMap.end()) {
+        auto entity = m_worldMap.at(key);
+
+        if (m_physics.areColliding(m_player, entity)) {
+          if (m_player->getComponent<CTransform>().vel.y > 0) {
+            for (auto& bottom : m_player->getComponent<CCollisionSensor>().down) {
+              Vec2 sensor   = m_player->getComponent<CTransform>().pos + bottom;
+              float overlap = m_physics.GetBottomSensorOverlap(sensor, entity);
+
+              if (overlap > 0) {
+                m_player->getComponent<CTransform>().pos.y -= overlap;
+                m_player->getComponent<CTransform>().vel.y = 0;
+                m_player->getComponent<CInput>().canJump = true;
+                if (m_player->getComponent<CTransform>().scale.x == 1) {
+                  if (entity->getComponent<CTransform>().scale.x == 1) {
+                    m_player->getComponent<CTransform>().angle = -entity->getComponent<CBoundingBox>().angle;
+                  
+                  } else {
+                    m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
+                  }
+                } else if (m_player->getComponent<CTransform>().scale.x == -1) {
+                  if (entity->getComponent<CTransform>().scale.x == 1) {
+                    m_player->getComponent<CTransform>().angle = -entity->getComponent<CBoundingBox>().angle;
+                  
+                  } else {
+                    m_player->getComponent<CTransform>().angle = entity->getComponent<CBoundingBox>().angle;
+                  }
+                }
               }
             }
-          }
-        }
-      } else if (m_player->getComponent<CTransform>().vel.y < 0) {
-        for (auto& top : m_player->getComponent<CCollisionSensor>().up) {
-          Vec2 sensor   = m_player->getComponent<CTransform>().pos + top;
-          float overlap = m_physics.GetTopSensorOverlap(sensor, entity);
+          } else if (m_player->getComponent<CTransform>().vel.y < 0) {
+            for (auto& top : m_player->getComponent<CCollisionSensor>().up) {
+              Vec2 sensor   = m_player->getComponent<CTransform>().pos + top;
+              float overlap = m_physics.GetTopSensorOverlap(sensor, entity);
 
-          if (overlap > 0) {
-            m_player->getComponent<CTransform>().pos.y += overlap;
-            m_player->getComponent<CTransform>().vel.y = 0;
-            m_player->getComponent<CInput>().canJump = false;
+              if (overlap > 0) {
+                m_player->getComponent<CTransform>().pos.y += overlap;
+                m_player->getComponent<CTransform>().vel.y = 0;
+                m_player->getComponent<CInput>().canJump = false;
+              }
+            }
           }
         }
       }
@@ -425,6 +467,62 @@ void Scene_Play::sRender () {
   for (auto entity : m_entities.getEntities()) {
     m_game->window().draw(entity->getComponent<CAnimation>().animation.getSprite());
   }
+
+  sf::RectangleShape tr({3,3});
+  
+  tr.setFillColor(sf::Color::Red);
+  tr.setPosition({ 
+    m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CCollisionSensor>().up[0].x - 3, 
+    m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CCollisionSensor>().up[0].y
+  });
+
+  sf::RectangleShape tl({3,3});
+  
+  tl.setFillColor(sf::Color::Red);  
+  tl.setPosition({ 
+    m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CCollisionSensor>().up[1].x, 
+    m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CCollisionSensor>().up[1].y
+  });
+  
+  sf::RectangleShape br({3,3});
+  
+  br.setFillColor(sf::Color::Blue);
+  br.setPosition({ 
+    m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CCollisionSensor>().down[0].x - 3,
+    m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CCollisionSensor>().down[0].y - 3
+  });
+
+  sf::RectangleShape bl({3,3});
+  
+  bl.setFillColor(sf::Color::Blue);
+  bl.setPosition({ 
+    m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CCollisionSensor>().down[1].x,
+    m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CCollisionSensor>().down[1].y - 3
+  });
+  
+  sf::RectangleShape left ({3,3});
+  
+  left.setFillColor(sf::Color::Green);
+  left.setPosition({ 
+    m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CCollisionSensor>().left.x,
+    m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CCollisionSensor>().left.y
+  });
+  
+  
+  sf::RectangleShape right ({3,3});
+  
+  right.setFillColor(sf::Color::Green);
+  right.setPosition({ 
+    m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CCollisionSensor>().right.x - 3,
+    m_player->getComponent<CTransform>().pos.y + m_player->getComponent<CCollisionSensor>().right.y
+  });  
+  
+  m_game->window().draw(br);
+  m_game->window().draw(bl);
+  m_game->window().draw(tr);
+  m_game->window().draw(tl);
+  m_game->window().draw(left);
+  m_game->window().draw(right);
 
   m_game->window().display();
 }

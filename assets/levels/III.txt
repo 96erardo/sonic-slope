@@ -54,8 +54,7 @@ Tile   Surface1  24  1  -1   1
 Tile   Surface9  30  1   1   1
 Tile   Surface10 31  1   1   1
 Tile   Surface11 32  1   1   1
-Tile   Surface0  33  1   1   1
-
+Tile   Surface17 33  1   1   1
 
 Tile   Surface1  11  2   1   1
 Tile   Surface2  12  2   1   1
@@ -68,7 +67,7 @@ Tile   Surface3  18  2  -1   1
 Tile   Surface2  19  2  -1   1
 Tile   Surface1  20  2  -1   1
 Tile   Surface12 33  2   1   1
-Tile   Surface0  34  2   1   1
+Tile   Surface17 34  2   1   1
 
 Tile   Surface1  21  3   1  -1
 Tile   Surface2  22  3   1  -1

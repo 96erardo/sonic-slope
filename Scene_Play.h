@@ -11,12 +11,13 @@ struct PlayerConfig {
 };
 
 class Scene_Play: public Scene {
-  sf::Color               m_background;
-  Entity*                 m_player;
-  PlayerConfig            m_playerConfig;
-  Physics                 m_physics;
-  float                   m_worldWidth = 0;
-  float                   m_offset     = 0;
+  sf::Color                        m_background;
+  Entity*                          m_player;
+  PlayerConfig                     m_playerConfig;
+  Physics                          m_physics;
+  std::map<unsigned int, Entity*>  m_worldMap;
+  float                            m_worldWidth = 0;
+  float                            m_offset     = 0;
 
   void init (const std::string& path) override;
   void spawnPlayer ();
