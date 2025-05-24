@@ -1,5 +1,7 @@
 #include "Physics.h"
 #include "Components.h"
+#include "constants.h"
+#include "utils.h"
 
 bool Physics::areColliding (Entity* a, Entity* b) const {
   return (
@@ -26,6 +28,34 @@ Vec2 Physics::GetPreviousOverlap (Entity* a, Entity* b) const {
   float yo = a->getComponent<CBoundingBox>().halfSize.y + b->getComponent<CBoundingBox>().halfSize.y;
   
   return Vec2(xo - dx, yo - dy);
+}
+
+float Physics::GetTileHeight (const Vec2& sensor, Entity* tile) const {
+  int index = 0;
+  
+  if (tile->getComponent<CTransform>().scale.x == 1) {
+    index = floorf(sensor.x - (tile->getComponent<CTransform>().pos.x - tile->getComponent<CBoundingBox>().halfSize.x));
+  } else {
+    index = floorf((tile->getComponent<CTransform>().pos.x + tile->getComponent<CBoundingBox>().halfSize.x) - sensor.x);
+  }
+
+  return tile->getComponent<CBoundingBox>().height[index];
+}
+
+float Physics::GetTileAngleForPlayer (Entity* player, Entity* tile) {
+  if (player->getComponent<CTransform>().scale.x == 1) {
+    if (tile->getComponent<CTransform>().scale.x == 1) {
+      return -tile->getComponent<CBoundingBox>().angle;          
+    } else {
+      return tile->getComponent<CBoundingBox>().angle;
+    }
+  } else if (player->getComponent<CTransform>().scale.x == -1) {
+    if (tile->getComponent<CTransform>().scale.x == 1) {
+      return -tile->getComponent<CBoundingBox>().angle;          
+    } else {
+      return tile->getComponent<CBoundingBox>().angle;
+    }
+  }
 }
 
 float Physics::GetLeftSensorOverlap (const Vec2& sensor, Entity* tile) const {
@@ -138,6 +168,57 @@ float Physics::GetTopSensorOverlap (const Vec2& sensor, Entity* tile) const {
       return 0;
     }
   }
+}
+
+Entity* Physics::GetTileForBottomSensor (const Vec2& sensor, std::map<unsigned int, Entity*>& map) {
+  Vec2 gridPos     = pixelToGridPosition(sensor);
+  Vec2 extension   = Vec2(0, -1);
+  Vec2 regresion   = Vec2(0,  1);
+  unsigned int key = genKey(gridPos.x, gridPos.y);
+
+  if (map.find(key) != map.end()) {
+    auto tile = map.at(key);
+    int height = GetTileHeight(sensor, tile);
+
+    if (height == GRID_SIZE) {
+      Vec2 regPos = gridPos + regresion;
+      unsigned int regKey = genKey(regPos.x, regPos.y);
+
+      if (map.find(regKey) != map.end()) {
+        return map.at(regKey);
+      } else {
+        return tile;
+      }
+    } if (height == 0) {
+      Vec2 extPos = gridPos + extension;
+      unsigned int extKey = genKey(extPos.x, extPos.y);
+
+      if (map.find(extKey) != map.end()) {
+        return map.at(extKey);
+      } else {
+        return tile;
+      }
+    } else {
+      return tile;
+    }
+  } else {
+    Vec2 extPos = gridPos + extension;
+    unsigned int extKey = genKey(extPos.x, extPos.y);
+
+    if (map.find(extKey) != map.end()) {
+      return map.at(extKey);
+    } else {
+      return nullptr;
+    }
+  }
+}
+
+float Physics::GetTileVerticalDistance (const Vec2& sensor, Entity* tile) const {
+  int height = GetTileHeight(sensor, tile);
+
+  return (
+    (tile->getComponent<CTransform>().pos.y + tile->getComponent<CBoundingBox>().halfSize.y - height) - sensor.y
+  );
 }
 
 float Physics::GetBottomSensorOverlap (const Vec2& sensor, Entity* tile) const {

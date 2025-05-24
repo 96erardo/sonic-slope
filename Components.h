@@ -59,8 +59,8 @@ class CBoundingBox: public Component {
 class CCollisionSensor: public Component {
 
   public:
-    std::vector<Vec2>  up;
-    std::vector<Vec2>  down;
+    std::vector<Vec2>  top;
+    std::vector<Vec2>  bottom;
     Vec2  left;
     Vec2  right;
 
