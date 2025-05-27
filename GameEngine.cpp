@@ -5,12 +5,14 @@
 #include "constants.h"
 #include "GameEngine.h"
 #include "Scene_Play.h"
+#include "ProfilerTimer.h"
 
 GameEngine::GameEngine (const std::string& level) {
   init(level);
 };
 
 void GameEngine::init(const std::string& level) {
+  PROFILE_FUNCTION();
   m_assets = Assets();
 
   m_window = sf::RenderWindow(

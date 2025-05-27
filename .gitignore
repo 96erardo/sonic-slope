@@ -2,3 +2,4 @@
 *.dSYM/*
 main
 .DS_Store
+result.json

@@ -5,6 +5,7 @@
 #include "Action.h"
 #include "Entity.h"
 #include "constants.h"
+#include "ProfilerTimer.h"
 #include "Components.h"
 #include "GameEngine.h"
 #include "Scene_Play.h"
@@ -154,6 +155,8 @@ void Scene_Play::doAction (const Action& action) {
 }
 
 void Scene_Play::sGravity () {
+  PROFILE_FUNCTION();
+
   for (auto entity : m_entities.getEntities()) {
     if (entity->hasComponent<CGravity>()) {
         entity->getComponent<CTransform>().vel.y += entity->getComponent<CGravity>().value;
@@ -162,6 +165,8 @@ void Scene_Play::sGravity () {
 }
 
 void Scene_Play::sVelocity () {
+  PROFILE_FUNCTION();
+
   m_player->getComponent<CTransform>().prevPos = m_player->getComponent<CTransform>().pos;
 
   if (m_player->getComponent<CInput>().right) {
@@ -252,6 +257,8 @@ void Scene_Play::sVelocity () {
 }
 
 void Scene_Play::sMovementX () {
+  PROFILE_FUNCTION();
+
   m_player->getComponent<CTransform>().pos.x += m_player->getComponent<CTransform>().vel.x;
 
   if (m_player->getComponent<CTransform>().pos.x - m_player->getComponent<CBoundingBox>().halfSize.x < 0) {
@@ -268,6 +275,8 @@ void Scene_Play::sMovementX () {
 }
 
 void Scene_Play::sCollisionX () {
+  PROFILE_FUNCTION();
+
   for (auto entity : m_entities.getEntities("Tile")) {
     if (m_physics.areColliding(m_player, entity)) {
       if (m_player->getComponent<CTransform>().vel.x > 0) {
@@ -307,10 +316,14 @@ void Scene_Play::sCollisionX () {
 }
 
 void Scene_Play::sMovementY () {
+  PROFILE_FUNCTION();
+
   m_player->getComponent<CTransform>().pos.y += m_player->getComponent<CTransform>().vel.y;
 }
 
 void Scene_Play::sCollisionY () {
+  PROFILE_FUNCTION();
+
   for (auto entity : m_entities.getEntities("Tile")) {
     Vec2 boxOverlap = m_physics.GetOverlap(m_player, entity);
 
@@ -343,6 +356,8 @@ void Scene_Play::sCollisionY () {
 }
 
 void Scene_Play::sState () {
+  PROFILE_FUNCTION();
+
   for (auto entity : m_entities.getEntities()) {
     if (entity->hasComponent<CState>() && entity->hasComponent<CAnimation>()) {
       if (
@@ -360,6 +375,8 @@ void Scene_Play::sState () {
 }
 
 void Scene_Play::sAnimation () {
+  PROFILE_FUNCTION();
+
   for (auto entity : m_entities.getEntities()) {
     entity->getComponent<CAnimation>().animation.getSprite().setPosition({
       entity->getComponent<CTransform>().pos.x,
@@ -382,6 +399,8 @@ void Scene_Play::sAnimation () {
 }
 
 void Scene_Play::sRender () {
+  PROFILE_FUNCTION();
+
   m_game->window().clear(sf::Color::White);
   
   float x = std::min(
@@ -406,6 +425,8 @@ void Scene_Play::sRender () {
 }
 
 void Scene_Play::update () {
+  PROFILE_FUNCTION();
+
   m_entities.update();
 
   sGravity();
