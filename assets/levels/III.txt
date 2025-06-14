@@ -1,10 +1,10 @@
 Tile   Surface0 0   0   1   1
-Tile   Surface8 1   0  -1   1
-Tile   Surface7 2   0  -1   1
-Tile   Surface6 3   0  -1   1
-Tile   Surface6 4   0   1   1
-Tile   Surface7 5   0   1   1
-Tile   Surface8 6   0   1   1
+Tile   Surface0 1   0   1   1
+Tile   Surface0 2   0   1   1
+Tile   Surface0 3   0   1   1
+Tile   Surface0 4   0   1   1
+Tile   Surface0 5   0   1   1
+Tile   Surface0 6   0   1   1
 Tile   Surface0 7   0   1   1
 Tile   Surface0 8   0   1   1
 Tile   Surface0 9   0   1   1
@@ -32,7 +32,7 @@ Tile   Surface0 30  0   1   1
 Tile   Surface0 31  0   1   1
 Tile   Surface0 32  0   1   1
 
-
+Tile   Surface0  3   1   1   1
 Tile   Surface1  7   1   1   1
 Tile   Surface2  8   1   1   1
 Tile   Surface3  9   1   1   1
