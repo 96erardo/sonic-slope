@@ -114,10 +114,10 @@ void Scene_Play::spawnPlayer () {
   );
 
   // mid left
-  entity->getComponent<CCollisionSensor>().left = Vec2(-entity->getComponent<CBoundingBox>().halfSize.x, 0);
+  entity->getComponent<CCollisionSensor>().left = Vec2(-entity->getComponent<CBoundingBox>().halfSize.x - 1, 0);
 
   // mid right
-  entity->getComponent<CCollisionSensor>().right = Vec2(entity->getComponent<CBoundingBox>().halfSize.x, 0);
+  entity->getComponent<CCollisionSensor>().right = Vec2(entity->getComponent<CBoundingBox>().halfSize.x + 1, 0);
 
   m_player = entity;
 }
@@ -277,11 +277,9 @@ void Scene_Play::sMovementX () {
 void Scene_Play::sCollisionX () {
   if (m_player->getComponent<CTransform>().vel.x > 0) {
     Vec2 sensor    = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().right;
-    Entity* tile   = m_physics.GetTileForRightSensor(sensor, m_worldMap);
+    Entity* tile   = m_physics.GetTileForSensor(sensor, m_worldMap, Direction::right);
 
     if (tile != nullptr) {
-      Vec2 tileGridPos = pixelToGridPosition(tile->getComponent<CTransform>().pos);
-      Vec2 playerGridPos = pixelToGridPosition(sensor);
       float distance = m_physics.GetTileDistanceFromRight(sensor, tile); 
 
       if (distance < 0) {
@@ -292,7 +290,7 @@ void Scene_Play::sCollisionX () {
     }
   } else if (m_player->getComponent<CTransform>().vel.x < 0) {
     Vec2 sensor    = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().left;
-    Entity* tile   = m_physics.GetTileForLeftSensor(sensor, m_worldMap);
+    Entity* tile   = m_physics.GetTileForSensor(sensor, m_worldMap, Direction::left);
 
     if (tile != nullptr) {
       float distance = m_physics.GetTileDistanceFromLeft(sensor, tile); 
@@ -305,16 +303,16 @@ void Scene_Play::sCollisionX () {
     }
   }
 
-  if (m_player->getComponent<CTransform>().vel.y > 0) {
+  if (m_player->getComponent<CTransform>().vel.x != 0) {
     float distance = ((GRID_SIZE * 2) + 1);
     Entity* tile = nullptr;
   
     for (auto& b : m_player->getComponent<CCollisionSensor>().bottom) {
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + b;
-      Entity* entity = m_physics.GetTileForBottomSensor(sensor, m_worldMap);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, Direction::bottom);
 
       if (entity != nullptr) {
-        float d = m_physics.GetTileVerticalDistance(sensor, entity);
+        float d = m_physics.GetTileDistanceFromBottom(sensor, entity);
 
         if (d < distance) {
           distance = d;
@@ -324,7 +322,7 @@ void Scene_Play::sCollisionX () {
     }
   
     if (tile != nullptr) {
-      if (distance <= 0) {
+      if (distance < 0) {
         m_player->getComponent<CTransform>().pos.y += distance;
         m_player->getComponent<CTransform>().vel.y  = 0;
         m_player->getComponent<CInput>().canJump    = true;
@@ -332,58 +330,6 @@ void Scene_Play::sCollisionX () {
       }
     }
   }
-
-  // Vec2 pos = pixelToGridPosition(m_player->getComponent<CTransform>().pos);
-
-  // for (int x = -1; x <= 1; x++) {
-  //   for (int y = -1; y <= 1; y++) {
-  //     Vec2 tilePos = pos + Vec2(x,y);
-
-  //     unsigned int key = genKey(tilePos.x, tilePos.y);
-
-  //     if (m_worldMap.find(key) != m_worldMap.end()) {
-  //       auto entity = m_worldMap.at(key);
-
-  //       if (m_physics.areColliding(m_player, entity)) {
-  //         if (m_player->getComponent<CTransform>().vel.x > 0) {
-  //           // mid right sensor
-  //           Vec2 mr = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().right;
-  //           float overlap = m_physics.GetRightSensorOverlap(mr, entity);
-  
-  //           if (overlap > 0) {
-  //             m_player->getComponent<CTransform>().pos.x -= overlap;
-  //             m_player->getComponent<CTransform>().vel.x = 0;
-  //             m_player->getComponent<CState>().state = "Pushing";
-  //           }
-  //         } else if (m_player->getComponent<CTransform>().vel.x < 0) {
-  //           // mid left sensor
-  //           Vec2 ml = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().left;
-  //           float overlap = m_physics.GetLeftSensorOverlap(ml, entity);
-  
-  //           if (overlap > 0) {
-  //             m_player->getComponent<CTransform>().pos.x += overlap;
-  //             m_player->getComponent<CTransform>().vel.x = 0;
-  //             m_player->getComponent<CState>().state = "Pushing";
-  //           }
-  //         }
-  
-  //         if (m_player->getComponent<CTransform>().vel.y > 0) {
-  //           for (auto& bottom : m_player->getComponent<CCollisionSensor>().bottom) {
-  //             Vec2 sensor   = m_player->getComponent<CTransform>().pos + bottom;
-  //             float overlap = m_physics.GetBottomSensorOverlap(sensor, entity);
-  
-  //             if (overlap > 0) {
-  //               if (overlap > 1) {
-  //                 std::cout << overlap << std::endl;
-  //               }
-  //               m_player->getComponent<CTransform>().pos.y -= overlap;
-  //             }
-  //           }
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
 }
 
 void Scene_Play::sMovementY () {
@@ -397,7 +343,7 @@ void Scene_Play::sCollisionY () {
 
     for (auto& t : m_player->getComponent<CCollisionSensor>().top) {
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + t;
-      Entity* entity = m_physics.GetTileForTopSensor(sensor, m_worldMap);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, Direction::top);
 
       if (entity != nullptr) {
         float d = m_physics.GetTileDistanceFromTop(sensor, entity);
@@ -409,7 +355,7 @@ void Scene_Play::sCollisionY () {
       }
 
       if (tile != nullptr) {
-        if (distance <= 0) {
+        if (distance < 0) {
           m_player->getComponent<CTransform>().pos.y -= distance;
           m_player->getComponent<CTransform>().vel.y  = 0;
           m_player->getComponent<CInput>().canJump    = false;
@@ -422,10 +368,10 @@ void Scene_Play::sCollisionY () {
   
     for (auto& b : m_player->getComponent<CCollisionSensor>().bottom) {
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + b;
-      Entity* entity = m_physics.GetTileForBottomSensor(sensor, m_worldMap);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, Direction::bottom);
 
       if (entity != nullptr) {
-        float d = m_physics.GetTileVerticalDistance(sensor, entity);
+        float d = m_physics.GetTileDistanceFromBottom(sensor, entity);
 
         if (d < distance) {
           distance = d;
@@ -435,7 +381,7 @@ void Scene_Play::sCollisionY () {
     }
   
     if (tile != nullptr) {
-      if (distance <= 0) {
+      if (distance < 0) {
         m_player->getComponent<CTransform>().pos.y += distance;
         m_player->getComponent<CTransform>().vel.y  = 0;
         m_player->getComponent<CInput>().canJump    = true;
@@ -507,22 +453,6 @@ void Scene_Play::sRender () {
 
   for (auto entity : m_entities.getEntities()) {
     m_game->window().draw(entity->getComponent<CAnimation>().animation.getSprite());
-  }
-
-  for (auto entity : m_entities.getEntities()) {
-    if (entity->tag() == "Tile") {
-      sf::RectangleShape rect({GRID_SIZE, GRID_SIZE});
-      rect.setOutlineColor(sf::Color::Green);
-      rect.setOutlineThickness(1);
-      rect.setFillColor(sf::Color::Transparent);
-      rect.setOrigin({GRID_SIZE / 2, GRID_SIZE / 2});
-      rect.setPosition({
-        entity->getComponent<CTransform>().pos.x,
-        entity->getComponent<CTransform>().pos.y
-      });
-      
-      m_game->window().draw(rect);
-    }
   }
 
   sf::RectangleShape tr({3,3});
