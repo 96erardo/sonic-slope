@@ -2,6 +2,7 @@
 #define COMPONENTS_H
 #include <SFML/Graphics.hpp>
 #include "Animation.h"
+#include "Sensor.h"
 #include "Vec2.h"
 
 class Component {
@@ -59,12 +60,25 @@ class CBoundingBox: public Component {
 class CCollisionSensor: public Component {
 
   public:
-    std::vector<Vec2>  top;
-    std::vector<Vec2>  bottom;
-    Vec2  left;
-    Vec2  right;
+    std::vector<Sensor>  top;
+    std::vector<Sensor>  bottom;
+    Sensor  left;
+    Sensor  right;
 
     CCollisionSensor () {};
+
+    void changeMode (int angle) {
+      for (auto& sensor : top) {
+        sensor.setMode(angle);
+      }
+
+      for (auto& sensor : bottom) {
+        sensor.setMode(angle);
+      }
+
+      left.setMode(angle);
+      right.setMode(angle);
+    }
 };
 
 class CInput: public Component {

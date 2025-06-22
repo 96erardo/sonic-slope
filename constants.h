@@ -9,13 +9,4 @@ const int GRID_SIZE = 32;
 
 const int BITWISE_OFFSET = pow(2, ((sizeof(int) * 8) / 2)) / 2;
 
-namespace Direction {
-  enum Direction {
-    top,
-    bottom,
-    left,
-    right
-  };
-}
-
 #endif

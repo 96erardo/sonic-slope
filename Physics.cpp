@@ -1,6 +1,7 @@
 #include "Physics.h"
 #include "Components.h"
 #include "constants.h"
+#include "Sensor.h"
 #include "utils.h"
 
 bool Physics::areColliding (Entity* a, Entity* b) const {
@@ -65,7 +66,7 @@ float Physics::GetTileWidth (const Vec2& sensor, Entity* tile) const {
 Entity* Physics::GetTileForSensor (
   const Vec2& sensor, 
   std::map<int, Entity*>& map,
-  Direction::Direction d
+  Sensor::Direction d
 ) {
   Vec2 gridPos     = pixelToGridPosition(sensor);
   Vec2 extension   = getExtension(d);
@@ -76,7 +77,7 @@ Entity* Physics::GetTileForSensor (
     auto tile = map.at(key);
     int value = 0;
 
-    if (d == Direction::top || d == Direction::bottom) {
+    if (d == Sensor::Direction::top || d == Sensor::Direction::bottom) {
       value = GetTileHeight(sensor, tile);
     } else {
       value = GetTileHeight(sensor, tile);
@@ -116,18 +117,17 @@ Entity* Physics::GetTileForSensor (
 }
 
 float Physics::GetTileAngleForPlayer (Entity* player, Entity* tile) {
-  if (player->getComponent<CTransform>().scale.x == 1) {
-    if (tile->getComponent<CTransform>().scale.x == 1) {
-      return -tile->getComponent<CBoundingBox>().angle;          
-    } else {
-      return tile->getComponent<CBoundingBox>().angle;
-    }
-  } else if (player->getComponent<CTransform>().scale.x == -1) {
-    if (tile->getComponent<CTransform>().scale.x == 1) {
-      return -tile->getComponent<CBoundingBox>().angle;          
-    } else {
-      return tile->getComponent<CBoundingBox>().angle;
-    }
+  if (tile->getComponent<CTransform>().scale.x == 1 && tile->getComponent<CTransform>().scale.y == 1) {
+    return -tile->getComponent<CBoundingBox>().angle;
+  
+  } else if (tile->getComponent<CTransform>().scale.x == 1 && tile->getComponent<CTransform>().scale.y == -1) {
+    return -tile->getComponent<CBoundingBox>().angle * 2;
+  
+  } else if (tile->getComponent<CTransform>().scale.x == -1 && tile->getComponent<CTransform>().scale.y == -1) {
+    return 180 - tile->getComponent<CBoundingBox>().angle;
+  
+  } else if (tile->getComponent<CTransform>().scale.x == -1 && tile->getComponent<CTransform>().scale.y == 1) {
+    return tile->getComponent<CBoundingBox>().angle;
   }
 
   return 0;

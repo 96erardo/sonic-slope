@@ -1,5 +1,6 @@
 #include <cmath>
 #include "utils.h"
+#include "Sensor.h"
 #include "constants.h"
 
 int genKey (int x, int y) {
@@ -13,28 +14,28 @@ Vec2 pixelToGridPosition (const Vec2& pos) {
   );
 }
 
-Vec2 getExtension (Direction::Direction d) {
+Vec2 getExtension (Sensor::Direction d) {
   switch (d) {
-    case Direction::top:
+    case Sensor::Direction::top:
       return Vec2(0,1);
-    case Direction::bottom:
+    case Sensor::Direction::bottom:
       return Vec2(0,-1);
-    case Direction::left:
+    case Sensor::Direction::left:
       return Vec2(-1, 0);
-    case Direction::right:
+    case Sensor::Direction::right:
       return Vec2(1, 0);
   }
 }
 
-Vec2 getRegression (Direction::Direction d) {
+Vec2 getRegression (Sensor::Direction d) {
   switch (d) {
-    case Direction::top:
+    case Sensor::Direction::top:
       return Vec2(0,-1);
-    case Direction::bottom:
+    case Sensor::Direction::bottom:
       return Vec2(0,1);
-    case Direction::left:
+    case Sensor::Direction::left:
       return Vec2(1, 0);
-    case Direction::right:
+    case Sensor::Direction::right:
       return Vec2(-1, 0);
   }
 }

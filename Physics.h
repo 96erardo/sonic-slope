@@ -3,6 +3,7 @@
 #include <map>
 #include "Vec2.h"
 #include "Entity.h"
+#include "Sensor.h"
 #include "constants.h"
 
 class Physics {
@@ -14,7 +15,7 @@ class Physics {
 
     float   GetTileHeight             (const Vec2& sensor, Entity* tile) const;
     float   GetTileWidth              (const Vec2& sensor, Entity* tile) const;
-    Entity* GetTileForSensor          (const Vec2& sensor, std::map<int, Entity*>& map, Direction::Direction d);
+    Entity* GetTileForSensor          (const Vec2& sensor, std::map<int, Entity*>& map, Sensor::Direction d);
     float   GetTileAngleForPlayer     (Entity* player, Entity* tile);
     float   GetTileDistanceFromBottom (const Vec2& sensor, Entity* tile) const;
     float   GetTileDistanceFromTop    (const Vec2& sensor, Entity* tile) const;
