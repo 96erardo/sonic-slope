@@ -1,145 +1,145 @@
-Tile   Surface0 0   0   1   1
-Tile   Surface0 1   0   1   1
-Tile   Surface0 2   0   1   1
-Tile   Surface0 3   0   1   1
-Tile   Surface0 4   0   1   1
-Tile   Surface0 5   0   1   1
-Tile   Surface0 6   0   1   1
-Tile   Surface0 7   0   1   1
-Tile   Surface0 8   0   1   1
-Tile   Surface0 9   0   1   1
-Tile   Surface0 10  0   1   1
-Tile   Surface0 11  0   1   1
-Tile   Surface0 12  0   1   1
-Tile   Surface0 13  0   1   1
-Tile   Surface0 14  0   1   1
-Tile   Surface0 15  0   1   1
-Tile   Surface0 16  0   1   1
-Tile   Surface0 17  0   1   1
-Tile   Surface0 18  0   1   1
-Tile   Surface0 19  0   1   1
-Tile   Surface0 20  0   1   1
-Tile   Surface0 21  0   1   1
-Tile   Surface0 22  0   1   1
-Tile   Surface0 23  0   1   1
-Tile   Surface0 24  0   1   1
-Tile   Surface0 25  0   1   1
-Tile   Surface0 26  0   1   1
-Tile   Surface0 27  0   1   1
-Tile   Surface0 28  0   1   1
-Tile   Surface0 29  0   1   1
-Tile   Surface0 30  0   1   1
-Tile   Surface0 31  0   1   1
-Tile   Surface0 32  0   1   1
+Tile   Surface0 0   0   1   1   1
+Tile   Surface0 1   0   1   1   1
+Tile   Surface0 2   0   1   1   1
+Tile   Surface0 3   0   1   1   1
+Tile   Surface0 4   0   1   1   1
+Tile   Surface0 5   0   1   1   1
+Tile   Surface0 6   0   1   1   1
+Tile   Surface0 7   0   1   1   1
+Tile   Surface0 8   0   1   1   1
+Tile   Surface0 9   0   1   1   1
+Tile   Surface0 10  0   1   1   1
+Tile   Surface0 11  0   1   1   1
+Tile   Surface0 12  0   1   1   1
+Tile   Surface0 13  0   1   1   1
+Tile   Surface0 14  0   1   1   1
+Tile   Surface0 15  0   1   1   1
+Tile   Surface0 16  0   1   1   1
+Tile   Surface0 17  0   1   1   1
+Tile   Surface0 18  0   1   1   1
+Tile   Surface0 19  0   1   1   1
+Tile   Surface0 20  0   1   1   1
+Tile   Surface0 21  0   1   1   1
+Tile   Surface0 22  0   1   1   1
+Tile   Surface0 23  0   1   1   1
+Tile   Surface0 24  0   1   1   1
+Tile   Surface0 25  0   1   1   1
+Tile   Surface0 26  0   1   1   1
+Tile   Surface0 27  0   1   1   1
+Tile   Surface0 28  0   1   1   1
+Tile   Surface0 29  0   1   1   1
+Tile   Surface0 30  0   1   1   1
+Tile   Surface0 31  0   1   1   1
+Tile   Surface0 32  0   1   1   1
 
-Tile   Surface0  3   1   1   1
-Tile   Surface1  7   1   1   1
-Tile   Surface2  8   1   1   1
-Tile   Surface3  9   1   1   1
-Tile   Surface4  10  1   1   1
-Tile   Surface0  11  1   1   1
-Tile   Surface0  12  1   1   1
-Tile   Surface0  13  1   1   1
-Tile   Surface0  14  1   1   1
-Tile   Surface0  15  1   1   1
-Tile   Surface0  16  1   1   1
-Tile   Surface0  17  1   1   1
-Tile   Surface0  18  1   1   1
-Tile   Surface0  19  1   1   1
-Tile   Surface0  20  1   1   1
-Tile   Surface4  21  1  -1   1
-Tile   Surface3  22  1  -1   1
-Tile   Surface2  23  1  -1   1
-Tile   Surface1  24  1  -1   1
-Tile   Surface9  30  1   1   1
-Tile   Surface10 31  1   1   1
-Tile   Surface11 32  1   1   1
-Tile   Surface17 33  1   1   1
+Tile   Surface0  3   1   1   1   1
+Tile   Surface1  7   1   1   1   0
+Tile   Surface2  8   1   1   1   0
+Tile   Surface3  9   1   1   1   0
+Tile   Surface4  10  1   1   1   0
+Tile   Surface0  11  1   1   1   1
+Tile   Surface0  12  1   1   1   1
+Tile   Surface0  13  1   1   1   1
+Tile   Surface0  14  1   1   1   1
+Tile   Surface0  15  1   1   1   1
+Tile   Surface0  16  1   1   1   1
+Tile   Surface0  17  1   1   1   1
+Tile   Surface0  18  1   1   1   1
+Tile   Surface0  19  1   1   1   1
+Tile   Surface0  20  1   1   1   1
+Tile   Surface4  21  1  -1   1   0
+Tile   Surface3  22  1  -1   1   0
+Tile   Surface2  23  1  -1   1   0
+Tile   Surface1  24  1  -1   1   0
+Tile   Surface9  30  1   1   1   0
+Tile   Surface10 31  1   1   1   0
+Tile   Surface11 32  1   1   1   0
+Tile   Surface17 33  1   1   1   0
 
-Tile   Surface1  11  2   1   1
-Tile   Surface2  12  2   1   1
-Tile   Surface3  13  2   1   1
-Tile   Surface4  14  2   1   1
-Tile   Surface0  15  2   1   1
-Tile   Surface0  16  2   1   1
-Tile   Surface4  17  2  -1   1
-Tile   Surface3  18  2  -1   1
-Tile   Surface2  19  2  -1   1
-Tile   Surface1  20  2  -1   1
-Tile   Surface12 33  2   1   1
-Tile   Surface17 34  2   1   1
+Tile   Surface1  11  2   1   1   0
+Tile   Surface2  12  2   1   1   0
+Tile   Surface3  13  2   1   1   0
+Tile   Surface4  14  2   1   1   0
+Tile   Surface0  15  2   1   1   1
+Tile   Surface0  16  2   1   1   1
+Tile   Surface4  17  2  -1   1   0
+Tile   Surface3  18  2  -1   1   0
+Tile   Surface2  19  2  -1   1   0
+Tile   Surface1  20  2  -1   1   0
+Tile   Surface12 33  2   1   1   0
+Tile   Surface17 34  2   1   1   0
 
-Tile   Surface1  21  3   1  -1
-Tile   Surface2  22  3   1  -1
-Tile   Surface3  23  3   1  -1
-Tile   Surface4  24  3   1  -1
-Tile   Surface0  25  3   1  -1
-Tile   Surface0  26  3   1  -1
-Tile   Surface13 34  3   1   1
-Tile   Surface0  35  3   1   1
+Tile   Surface1  21  3   1  -1   0
+Tile   Surface2  22  3   1  -1   0
+Tile   Surface3  23  3   1  -1   0
+Tile   Surface4  24  3   1  -1   0
+Tile   Surface0  25  3   1  -1   1
+Tile   Surface0  26  3   1  -1   1
+Tile   Surface13 34  3   1   1   0
+Tile   Surface0  35  3   1   1   1
 
-Tile   Surface1  17  4   1  -1
-Tile   Surface2  18  4   1  -1
-Tile   Surface3  19  4   1  -1
-Tile   Surface4  20  4   1  -1
-Tile   Surface0  21  4   1  -1
-Tile   Surface0  22  4   1  -1
-Tile   Surface0  23  4   1  -1
-Tile   Surface0  24  4   1  -1
-Tile   Surface0  25  4   1  -1
-Tile   Surface0  26  4   1  -1
-Tile   Surface14 34  4   1   1
-Tile   Surface0  35  4   1   1
+Tile   Surface1  17  4   1  -1   0
+Tile   Surface2  18  4   1  -1   0
+Tile   Surface3  19  4   1  -1   0
+Tile   Surface4  20  4   1  -1   0
+Tile   Surface0  21  4   1  -1   1
+Tile   Surface0  22  4   1  -1   1
+Tile   Surface0  23  4   1  -1   1
+Tile   Surface0  24  4   1  -1   1
+Tile   Surface0  25  4   1  -1   1
+Tile   Surface0  26  4   1  -1   1
+Tile   Surface14 34  4   1   1   0
+Tile   Surface0  35  4   1   1   1
 
-Tile   Surface0  17  5   1  -1
-Tile   Surface0  18  5   1  -1
-Tile   Surface0  19  5   1  -1
-Tile   Surface0  20  5   1  -1
-Tile   Surface0  21  5   1  -1
-Tile   Surface0  22  5   1  -1
-Tile   Surface0  23  5   1  -1
-Tile   Surface0  24  5   1  -1
-Tile   Surface0  25  5   1  -1
-Tile   Surface0  26  5   1  -1
-Tile   Surface15 34  5   1   1
-Tile   Surface0  35  5   1   1
+Tile   Surface0  17  5   1  -1   1
+Tile   Surface0  18  5   1  -1   1
+Tile   Surface0  19  5   1  -1   1
+Tile   Surface0  20  5   1  -1   1
+Tile   Surface0  21  5   1  -1   1
+Tile   Surface0  22  5   1  -1   1
+Tile   Surface0  23  5   1  -1   1
+Tile   Surface0  24  5   1  -1   1
+Tile   Surface0  25  5   1  -1   1
+Tile   Surface0  26  5   1  -1   1
+Tile   Surface15 34  5   1   1   0
+Tile   Surface0  35  5   1   1   1
 
-Tile   Surface0  17  6   1  -1
-Tile   Surface0  18  6   1  -1
-Tile   Surface0  19  6   1  -1
-Tile   Surface0  20  6   1  -1
-Tile   Surface0  21  6   1  -1
-Tile   Surface0  22  6   1  -1
-Tile   Surface0  23  6   1  -1
-Tile   Surface0  24  6   1  -1
-Tile   Surface0  25  6   1  -1
-Tile   Surface0  26  6   1  -1
-Tile   Surface16 35  6   1   1
-Tile   Surface0  36  6   1   1
-Tile   Surface0  37  6   1   1
-Tile   Surface0  38  6   1   1
-Tile   Surface0  39  6   1   1
-Tile   Surface0  40  6   1   1
-Tile   Surface0  41  6   1   1
-Tile   Surface0  42  6   1   1
-Tile   Surface0  43  6   1   1
-Tile   Surface0  44  6   1   1
-Tile   Surface0  45  6   1   1
-Tile   Surface0  46  6   1   1
-Tile   Surface0  47  6   1   1
-Tile   Surface0  48  6   1   1
-Tile   Surface0  49  6   1   1
-Tile   Surface0  50  6   1   1
+Tile   Surface0  17  6   1  -1   1
+Tile   Surface0  18  6   1  -1   1
+Tile   Surface0  19  6   1  -1   1
+Tile   Surface0  20  6   1  -1   1
+Tile   Surface0  21  6   1  -1   1
+Tile   Surface0  22  6   1  -1   1
+Tile   Surface0  23  6   1  -1   1
+Tile   Surface0  24  6   1  -1   1
+Tile   Surface0  25  6   1  -1   1
+Tile   Surface0  26  6   1  -1   1
+Tile   Surface16 35  6   1   1   0
+Tile   Surface0  36  6   1   1   1
+Tile   Surface0  37  6   1   1   1
+Tile   Surface0  38  6   1   1   1
+Tile   Surface0  39  6   1   1   1
+Tile   Surface0  40  6   1   1   1
+Tile   Surface0  41  6   1   1   1
+Tile   Surface0  42  6   1   1   1
+Tile   Surface0  43  6   1   1   1
+Tile   Surface0  44  6   1   1   1
+Tile   Surface0  45  6   1   1   1
+Tile   Surface0  46  6   1   1   1
+Tile   Surface0  47  6   1   1   1
+Tile   Surface0  48  6   1   1   1
+Tile   Surface0  49  6   1   1   1
+Tile   Surface0  50  6   1   1   1
 
-Tile   Surface0 17  7   1  -1
-Tile   Surface0 18  7   1  -1
-Tile   Surface0 19  7   1  -1
-Tile   Surface0 20  7   1  -1
-Tile   Surface0 21  7   1  -1
-Tile   Surface0 22  7   1  -1
-Tile   Surface0 23  7   1  -1
-Tile   Surface0 24  7   1  -1
-Tile   Surface0 25  7   1  -1
-Tile   Surface0 26  7   1  -1
+Tile   Surface0 17  7   1  -1   1
+Tile   Surface0 18  7   1  -1   1
+Tile   Surface0 19  7   1  -1   1
+Tile   Surface0 20  7   1  -1   1
+Tile   Surface0 21  7   1  -1   1
+Tile   Surface0 22  7   1  -1   1
+Tile   Surface0 23  7   1  -1   1
+Tile   Surface0 24  7   1  -1   1
+Tile   Surface0 25  7   1  -1   1
+Tile   Surface0 26  7   1  -1   1
 
 Player          0  1  0.05  0.1  4  0.75
