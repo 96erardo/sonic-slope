@@ -28,11 +28,11 @@ void Scene_Play::init(const std::string& path) {
   while (file >> command) {
     if (command == "Tile") {
       std::string name;
-      unsigned int x, y;
-      float a;
+      unsigned int x, y, angleFlag;
       int scaleX, scaleY;
+      float a;
 
-      file >> name >> x >> y >> scaleX >> scaleY;
+      file >> name >> x >> y >> scaleX >> scaleY >> angleFlag;
 
       auto entity = m_entities.addEntity("Tile");
       auto animation = m_game->assets().getAnimation(name);
@@ -51,9 +51,13 @@ void Scene_Play::init(const std::string& path) {
 
       while (info >> command) {
         if (command == "a") {
-          info >> a;
-          entity->getComponent<CBoundingBox>().angle = a;
-
+          if (angleFlag == 1) {
+            info >> a;
+            entity->getComponent<CBoundingBox>().angle = -1;
+          } else {
+            info >> a;
+            entity->getComponent<CBoundingBox>().angle = a;
+          }
         } else if (command == "v") {
           for (int i = 0; i < 32; i++) {
             info >> y;
@@ -206,6 +210,7 @@ void Scene_Play::sGravity () {
 }
 
 void Scene_Play::sVelocity () {
+  m_player->getComponent<CCollisionSensor>().changeMode(m_player->getComponent<CTransform>().angle);
   m_player->getComponent<CTransform>().prevPos = m_player->getComponent<CTransform>().pos;
 
   if (m_player->getComponent<CInput>().right) {
@@ -363,7 +368,7 @@ void Scene_Play::sCollisionX () {
         m_player->getComponent<CTransform>().pos.y += distance;
         m_player->getComponent<CTransform>().vel.y  = 0;
         m_player->getComponent<CInput>().canJump    = true;
-        // m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+        m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
       }
     }
   }
@@ -423,11 +428,6 @@ void Scene_Play::sCollisionY () {
         m_player->getComponent<CTransform>().vel.y  = 0;
         m_player->getComponent<CInput>().canJump    = true;
         m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
-        m_player->getComponent<CCollisionSensor>().changeMode(m_player->getComponent<CTransform>().angle);
-
-        if (m_player->getComponent<CCollisionSensor>().left.mode == Sensor::Mode::wRight) {
-          std::cout << "Hello World";
-        }
       }
     }
   }

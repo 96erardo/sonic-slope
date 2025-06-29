@@ -7,6 +7,9 @@
 #include "constants.h"
 
 class Physics {
+  private:
+    float GetSnappedAngle (Entity* player);
+
   public:
     Vec2 GetOverlap (Entity* a, Entity* b) const; 
     Vec2 GetPreviousOverlap (Entity* a, Entity* b) const;

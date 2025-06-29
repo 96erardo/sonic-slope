@@ -1,3 +1,4 @@
+#include <cmath>
 #include "Physics.h"
 #include "Components.h"
 #include "constants.h"
@@ -117,6 +118,10 @@ Entity* Physics::GetTileForSensor (
 }
 
 float Physics::GetTileAngleForPlayer (Entity* player, Entity* tile) {
+  if (tile->getComponent<CBoundingBox>().angle == -1) {
+    return GetSnappedAngle(player);
+  }
+
   if (tile->getComponent<CTransform>().scale.x == 1 && tile->getComponent<CTransform>().scale.y == 1) {
     return -tile->getComponent<CBoundingBox>().angle;
   
@@ -131,6 +136,10 @@ float Physics::GetTileAngleForPlayer (Entity* player, Entity* tile) {
   }
 
   return 0;
+}
+
+float Physics::GetSnappedAngle (Entity* player) {
+  return std::fmod(std::round(player->getComponent<CTransform>().angle / 90), 3) * 90;
 }
 
 float Physics::GetTileDistanceFromBottom (const Vec2& sensor, Entity* tile) const {
