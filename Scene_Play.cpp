@@ -406,6 +406,8 @@ void Scene_Play::sCollisionY () {
     }
   } else if (m_player->getComponent<CTransform>().vel.y > 0) {
     float distance = ((GRID_SIZE * 2) + 1);
+    short int touching = 0;
+    short int side = 0;
     Entity* tile = nullptr;
   
     for (auto& b : m_player->getComponent<CCollisionSensor>().bottom) {
@@ -414,10 +416,20 @@ void Scene_Play::sCollisionY () {
 
       if (entity != nullptr) {
         float d = m_physics.GetTileDistanceFromBottom(sensor, entity);
+        
+        if (d < 0) {
+          touching++;
+        }
 
         if (d < distance) {
           distance = d;
           tile = entity;
+
+          if (b.pos().x > 0) {
+            side = 1;
+          } else {
+            side = -1;
+          }
         }
       }
     }
@@ -428,6 +440,26 @@ void Scene_Play::sCollisionY () {
         m_player->getComponent<CTransform>().vel.y  = 0;
         m_player->getComponent<CInput>().canJump    = true;
         m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+      }
+    }
+
+    if (
+      tile != nullptr &&
+      m_player->getComponent<CTransform>().vel.y == 0 &&
+      m_player->getComponent<CTransform>().vel.x == 0 &&
+      m_player->getComponent<CCollisionSensor>().bottom[0].mode == Sensor::Mode::floor &&
+      touching == 1
+    ) {
+      Vec2 sensor = m_player->getComponent<CTransform>().pos + Vec2(0, m_player->getComponent<CBoundingBox>().halfSize.y);
+      
+      if (side == 1 && m_player->getComponent<CTransform>().scale.x == -1) {
+        if (sensor.x < (tile->getComponent<CTransform>().pos.x - tile->getComponent<CBoundingBox>().halfSize.x)) {
+          m_player->getComponent<CState>().state = "Balancing";
+        }
+      } else if (side == -1 && m_player->getComponent<CTransform>().scale.x == 1) {
+        if (sensor.x > (tile->getComponent<CTransform>().pos.x + tile->getComponent<CBoundingBox>().halfSize.x)) {
+          m_player->getComponent<CState>().state = "Balancing";
+        }
       }
     }
   }

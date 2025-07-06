@@ -4,6 +4,7 @@ Texture    TexRunFast      assets/images/sonic/running_faster.png
 Texture    TexStop         assets/images/sonic/stopping.png
 Texture    TexJump         assets/images/sonic/jumping.png
 Texture    TexPushing      assets/images/sonic/pushing.png
+Texture    TexBalancing    assets/images/sonic/balancing.png
 Texture    TexSurface0     assets/images/tiles/surface-0.png
 Texture    TexSurface1     assets/images/tiles/surface-1.png
 Texture    TexSurface2     assets/images/tiles/surface-2.png
@@ -28,6 +29,7 @@ Animation  RunningFast     TexRunFast    4     8      26     40
 Animation  Stopping        TexStop       1     0      26     40
 Animation  Pushing         TexPushing    1     0      26     40
 Animation  Jumping         TexJump       5     5      26     40
+Animation  Balancing       TexBalancing  2     30     26     40
 Animation  Surface0        TexSurface0   1     0      32     32
 Animation  Surface1        TexSurface1   1     0      32     32
 Animation  Surface2        TexSurface2   1     0      32     32
