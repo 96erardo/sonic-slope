@@ -27,6 +27,14 @@ class CTransform: public Component {
     {}
 };
 
+class CGroundSpeed: public Component {
+  public:
+    bool  grounded = true;
+    float speed    = 0;
+
+  CGroundSpeed () {};
+};
+
 class CGravity: public Component {
   public: 
     float value = 0;

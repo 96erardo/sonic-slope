@@ -7,7 +7,7 @@
 #include "Physics.h"
 
 struct PlayerConfig {
-  float X, Y, ACC, DEC, MAXSPEED, GRAVITY;
+  float X, Y, ACC, AIR_ACC, FRIC, DEC, MAXSPEED, JUMP, GRAVITY;
 };
 
 class Scene_Play: public Scene {
@@ -15,7 +15,7 @@ class Scene_Play: public Scene {
   Entity*                          m_player;
   PlayerConfig                     m_playerConfig;
   Physics                          m_physics;
-  std::map<int, Entity*>  m_worldMap;
+  std::map<int, Entity*>           m_worldMap;
   float                            m_worldWidth = 0;
   float                            m_offset     = 0;
 

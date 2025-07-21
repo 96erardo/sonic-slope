@@ -123,10 +123,10 @@ float Physics::GetTileAngleForPlayer (Entity* player, Entity* tile) {
   }
 
   if (tile->getComponent<CTransform>().scale.x == 1 && tile->getComponent<CTransform>().scale.y == 1) {
-    return -tile->getComponent<CBoundingBox>().angle;
+    return 360 - tile->getComponent<CBoundingBox>().angle;
   
   } else if (tile->getComponent<CTransform>().scale.x == 1 && tile->getComponent<CTransform>().scale.y == -1) {
-    return -tile->getComponent<CBoundingBox>().angle * 2;
+    return 270 - tile->getComponent<CBoundingBox>().angle;
   
   } else if (tile->getComponent<CTransform>().scale.x == -1 && tile->getComponent<CTransform>().scale.y == -1) {
     return 180 - tile->getComponent<CBoundingBox>().angle;
@@ -139,7 +139,7 @@ float Physics::GetTileAngleForPlayer (Entity* player, Entity* tile) {
 }
 
 float Physics::GetSnappedAngle (Entity* player) {
-  return std::fmod(std::round(player->getComponent<CTransform>().angle / 90), 3) * 90;
+  return std::fmod(std::round(player->getComponent<CTransform>().angle / 90.0f), 4) * 90;
 }
 
 float Physics::GetTileDistanceFromBottom (const Vec2& sensor, Entity* tile) const {

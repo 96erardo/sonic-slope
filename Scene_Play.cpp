@@ -77,8 +77,11 @@ void Scene_Play::init(const std::string& path) {
       file >> m_playerConfig.X 
         >> m_playerConfig.Y 
         >> m_playerConfig.ACC 
+        >> m_playerConfig.AIR_ACC
+        >> m_playerConfig.FRIC
         >> m_playerConfig.DEC
         >> m_playerConfig.MAXSPEED
+        >> m_playerConfig.JUMP
         >> m_playerConfig.GRAVITY;
 
         spawnPlayer();
@@ -93,6 +96,7 @@ void Scene_Play::spawnPlayer () {
   entity->addComponent<CInput>();
   entity->addComponent<CAnimation>(*animation);
   entity->addComponent<CTransform>(gridToMidPixel(m_playerConfig.X, m_playerConfig.Y, entity), Vec2(0,0), 0);
+  entity->addComponent<CGroundSpeed>();
   entity->addComponent<CGravity>(m_playerConfig.GRAVITY);
   entity->addComponent<CBoundingBox>(animation->getBoundingBox().x, animation->getBoundingBox().y);
   entity->addComponent<CCollisionSensor>();
@@ -183,7 +187,7 @@ void Scene_Play::doAction (const Action& action) {
     }
 
     if (action.name() == "JUMP") {
-      m_player->getComponent<CInput>().jump = true;
+       m_player->getComponent<CInput>().jump = true;
     }
   } else if (action.type() == "END") {
     if (action.name() == "LEFT") {
@@ -196,7 +200,6 @@ void Scene_Play::doAction (const Action& action) {
 
     if (action.name() == "JUMP") {
       m_player->getComponent<CInput>().jump = false;
-      m_player->getComponent<CInput>().canJump = false;
     }
   }
 }
@@ -210,93 +213,128 @@ void Scene_Play::sGravity () {
 }
 
 void Scene_Play::sVelocity () {
+  std::cout << m_player->getComponent<CTransform>().angle << " ";
+  std::cout << m_player->getComponent<CCollisionSensor>().bottom[0].mode << std::endl;
   m_player->getComponent<CCollisionSensor>().changeMode(m_player->getComponent<CTransform>().angle);
   m_player->getComponent<CTransform>().prevPos = m_player->getComponent<CTransform>().pos;
 
   if (m_player->getComponent<CInput>().right) {
-    m_player->getComponent<CState>().state = "Running";
+    if (m_player->getComponent<CGroundSpeed>().grounded) {
+      m_player->getComponent<CState>().state = "Running";
 
-    if (m_player->getComponent<CTransform>().vel.x < 0) {
-      m_player->getComponent<CTransform>().vel.x = std::min(
-        m_playerConfig.MAXSPEED,
-        m_player->getComponent<CTransform>().vel.x + m_playerConfig.DEC
-      );
-
-      m_player->getComponent<CState>().state = "Stopping";
-
-    } else {
-      m_player->getComponent<CTransform>().vel.x = std::min(
-        m_playerConfig.MAXSPEED,
-        m_player->getComponent<CTransform>().vel.x + m_playerConfig.ACC
-      );
-
-      m_player->getComponent<CTransform>().scale = Vec2(1, 1);
-
-      if (abs(m_player->getComponent<CTransform>().vel.x) > 3.5) {
-        m_player->getComponent<CState>().state = "RunningFast";
-      }
-    }
-
-  } else if (m_player->getComponent<CInput>().left) {
-    m_player->getComponent<CState>().state = "Running";
-    
-    if (m_player->getComponent<CTransform>().vel.x > 0) {
-      m_player->getComponent<CTransform>().vel.x = std::max(
-        -m_playerConfig.MAXSPEED,
-        m_player->getComponent<CTransform>().vel.x - m_playerConfig.DEC
-      );
-
-      m_player->getComponent<CState>().state = "Stopping";
-
-    } else {
-      m_player->getComponent<CTransform>().vel.x = std::max(
-        -m_playerConfig.MAXSPEED,
-        m_player->getComponent<CTransform>().vel.x - m_playerConfig.ACC
-      );
-
-      m_player->getComponent<CTransform>().scale = Vec2(-1, 1);
-
-      if (abs(m_player->getComponent<CTransform>().vel.x) > 3.5) {
-        m_player->getComponent<CState>().state = "RunningFast";
-      }
-    }
-
-  } else {
-    if (m_player->getComponent<CTransform>().vel.x != 0) {
-      if (m_player->getComponent<CTransform>().vel.x > 0) {
-        m_player->getComponent<CTransform>().vel.x = std::max(
-          0.0f,
-          m_player->getComponent<CTransform>().vel.x - m_playerConfig.ACC
+      if (m_player->getComponent<CTransform>().vel.x < 0) {
+        m_player->getComponent<CGroundSpeed>().speed = std::min(
+          m_playerConfig.MAXSPEED,
+          m_player->getComponent<CGroundSpeed>().speed + m_playerConfig.DEC
         );
+  
+        m_player->getComponent<CState>().state = "Stopping";
+  
       } else {
-        m_player->getComponent<CTransform>().vel.x = std::min(
-          0.0f,
-          m_player->getComponent<CTransform>().vel.x + m_playerConfig.ACC
+        m_player->getComponent<CGroundSpeed>().speed = std::min(
+          m_playerConfig.MAXSPEED,
+          m_player->getComponent<CGroundSpeed>().speed + m_playerConfig.ACC
         );
-      }
-
-      if (m_player->getComponent<CState>().state != "Stopping") {
-        m_player->getComponent<CState>().state = "Running";
-
-        if (abs(m_player->getComponent<CTransform>().vel.x) > 3.5) {
+  
+        m_player->getComponent<CTransform>().scale = Vec2(1, 1);
+  
+        if (abs(m_player->getComponent<CGroundSpeed>().speed) > (m_playerConfig.MAXSPEED / 2)) {
           m_player->getComponent<CState>().state = "RunningFast";
         }
       }
     } else {
-      m_player->getComponent<CState>().state = "Stand";
+      m_player->getComponent<CTransform>().vel.x = std::min(
+        m_playerConfig.MAXSPEED,
+        m_player->getComponent<CTransform>().vel.x + m_playerConfig.AIR_ACC
+      );
+
+      m_player->getComponent<CTransform>().scale = Vec2(1, 1);
+
+      if (m_player->getComponent<CState>().state != "Jumping") {
+        if (abs(m_player->getComponent<CTransform>().vel.x) > (m_playerConfig.MAXSPEED / 2)) {
+          m_player->getComponent<CState>().state = "RunningFast";
+        }
+      }
     }
+  } else if (m_player->getComponent<CInput>().left) {
+    if (m_player->getComponent<CGroundSpeed>().grounded) {
+      m_player->getComponent<CState>().state = "Running";
+
+      if (m_player->getComponent<CTransform>().vel.x > 0) {
+        m_player->getComponent<CGroundSpeed>().speed = std::max(
+          -m_playerConfig.MAXSPEED,
+          m_player->getComponent<CGroundSpeed>().speed - m_playerConfig.DEC
+        );
+  
+        m_player->getComponent<CState>().state = "Stopping";
+  
+      } else {
+        m_player->getComponent<CGroundSpeed>().speed = std::max(
+          -m_playerConfig.MAXSPEED,
+          m_player->getComponent<CGroundSpeed>().speed - m_playerConfig.ACC
+        );
+  
+        m_player->getComponent<CTransform>().scale = Vec2(-1, 1);
+  
+        if (abs(m_player->getComponent<CGroundSpeed>().speed) > (m_playerConfig.MAXSPEED / 2)) {
+          m_player->getComponent<CState>().state = "RunningFast";
+        }
+      }
+    } else {
+      m_player->getComponent<CTransform>().vel.x = std::max(
+        -m_playerConfig.MAXSPEED,
+        m_player->getComponent<CTransform>().vel.x - m_playerConfig.AIR_ACC
+      );
+
+      m_player->getComponent<CTransform>().scale = Vec2(-1, 1);
+
+      if (m_player->getComponent<CState>().state != "Jumping") {
+        if (abs(m_player->getComponent<CTransform>().vel.x) > (m_playerConfig.MAXSPEED / 2)) {
+          m_player->getComponent<CState>().state = "RunningFast";
+        }
+      }
+    }    
+  } else {
+    if (m_player->getComponent<CGroundSpeed>().speed != 0) {
+      if (m_player->getComponent<CGroundSpeed>().grounded) {
+        if (m_player->getComponent<CGroundSpeed>().speed > 0) {
+          m_player->getComponent<CGroundSpeed>().speed = std::max(
+            0.0f,
+            m_player->getComponent<CGroundSpeed>().speed - m_playerConfig.FRIC
+          );
+        } else {
+          m_player->getComponent<CGroundSpeed>().speed = std::min(
+            0.0f,
+            m_player->getComponent<CGroundSpeed>().speed + m_playerConfig.FRIC
+          );
+        }
+  
+        if (m_player->getComponent<CState>().state != "Stopping") {
+          m_player->getComponent<CState>().state = "Running";
+  
+          if (abs(m_player->getComponent<CGroundSpeed>().speed) > (m_playerConfig.MAXSPEED / 2)) {
+            m_player->getComponent<CState>().state = "RunningFast";
+          }
+        }
+      }
+    } else {
+      if (m_player->getComponent<CState>().state != "Jumping") {
+        m_player->getComponent<CState>().state = "Stand";
+      }
+    }
+  }    
+    
+  if (m_player->getComponent<CGroundSpeed>().grounded) {
+    m_player->getComponent<CTransform>().vel.x = m_player->getComponent<CGroundSpeed>().speed *  cosf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+    m_player->getComponent<CTransform>().vel.y = m_player->getComponent<CGroundSpeed>().speed * -sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
   }
 
-  if (
-    m_player->getComponent<CInput>().jump &&
-    m_player->getComponent<CInput>().canJump
-  ) {
+  if (m_player->getComponent<CInput>().jump && m_player->getComponent<CInput>().canJump) {
     m_player->getComponent<CInput>().canJump = false;
-    m_player->getComponent<CTransform>().vel.y += -10;
-  }
-  
-  if (m_player->getComponent<CInput>().canJump == false) {
     m_player->getComponent<CState>().state = "Jumping";
+    m_player->getComponent<CGroundSpeed>().grounded = false;
+    m_player->getComponent<CTransform>().vel.x -= m_playerConfig.JUMP * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+    m_player->getComponent<CTransform>().vel.y -= m_playerConfig.JUMP * cosf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
   }
 }
 
@@ -306,13 +344,21 @@ void Scene_Play::sMovementX () {
   if (m_player->getComponent<CTransform>().pos.x - m_player->getComponent<CBoundingBox>().halfSize.x < 0) {
     m_player->getComponent<CTransform>().pos.x = m_player->getComponent<CBoundingBox>().halfSize.x;
     m_player->getComponent<CTransform>().vel.x = 0;
-    m_player->getComponent<CState>().state = "Pushing";
+    m_player->getComponent<CGroundSpeed>().speed = 0;
+    
+    if (m_player->getComponent<CState>().state != "Jumping") {
+      m_player->getComponent<CState>().state = "Pushing";
+    }
   }
 
   if (m_player->getComponent<CTransform>().pos.x + m_player->getComponent<CBoundingBox>().halfSize.x > m_worldWidth) {
     m_player->getComponent<CTransform>().pos.x = m_worldWidth - m_player->getComponent<CBoundingBox>().halfSize.x;
     m_player->getComponent<CTransform>().vel.x = 0;
-    m_player->getComponent<CState>().state = "Pushing";
+    m_player->getComponent<CGroundSpeed>().speed = 0;
+    
+    if (m_player->getComponent<CState>().state != "Jumping") {
+      m_player->getComponent<CState>().state = "Pushing";
+    }
   }
 }
 
@@ -327,7 +373,9 @@ void Scene_Play::sCollisionX () {
       if (distance < 0) {
         m_player->getComponent<CTransform>().pos.x += distance;
         m_player->getComponent<CTransform>().vel.x = 0;
-        m_player->getComponent<CState>().state = "Pushing";
+        if (m_player->getComponent<CState>().state != "Jumping") {
+          m_player->getComponent<CState>().state = "Pushing";
+        }
       }
     }
   } else if (m_player->getComponent<CTransform>().vel.x < 0) {
@@ -340,7 +388,9 @@ void Scene_Play::sCollisionX () {
       if (distance < 0) {
         m_player->getComponent<CTransform>().pos.x -= distance;
         m_player->getComponent<CTransform>().vel.x = 0;
-        m_player->getComponent<CState>().state = "Pushing";
+        if (m_player->getComponent<CState>().state != "Jumping") {
+          m_player->getComponent<CState>().state = "Pushing";
+        }
       }
     }
   }
@@ -365,11 +415,52 @@ void Scene_Play::sCollisionX () {
   
     if (tile != nullptr) {
       if (distance < 0) {
-        m_player->getComponent<CTransform>().pos.y += distance;
         m_player->getComponent<CTransform>().vel.y  = 0;
         m_player->getComponent<CInput>().canJump    = true;
+        m_player->getComponent<CTransform>().pos.y += distance;
         m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+
+        if (m_player->getComponent<CGroundSpeed>().grounded == false) {
+          m_player->getComponent<CGroundSpeed>().grounded = true;
+          m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+        }
+
+        if (m_player->getComponent<CState>().state == "Jumping") {
+          if (m_player->getComponent<CTransform>().vel.x != 0) {
+            m_player->getComponent<CState>().state = "Running";
+          } else {
+            m_player->getComponent<CState>().state = "Stand";
+          }
+        }
+      } else {
+        if (distance > 0) {
+          m_player->getComponent<CGroundSpeed>().grounded = false;
+          m_player->getComponent<CInput>().canJump        = false;
+        }
+
+        if (m_player->getComponent<CState>().state != "Jumping" && distance > 0 && distance <= 8) {
+          m_player->getComponent<CTransform>().vel.y  = 0;
+          m_player->getComponent<CInput>().canJump    = true;
+          m_player->getComponent<CTransform>().pos.y += distance;
+          m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+
+          if (m_player->getComponent<CGroundSpeed>().grounded == false) {
+            m_player->getComponent<CGroundSpeed>().grounded = true;
+            m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+          }
+
+          if (m_player->getComponent<CState>().state == "Jumping") {
+            if (m_player->getComponent<CTransform>().vel.x != 0) {
+              m_player->getComponent<CState>().state = "Running";
+            } else {
+              m_player->getComponent<CState>().state = "Stand";
+            }
+          }
+        }
       }
+    } else {
+      m_player->getComponent<CGroundSpeed>().grounded = false;
+      m_player->getComponent<CInput>().canJump        = false;
     }
   }
 }
@@ -436,32 +527,73 @@ void Scene_Play::sCollisionY () {
   
     if (tile != nullptr) {
       if (distance < 0) {
-        m_player->getComponent<CTransform>().pos.y += distance;
         m_player->getComponent<CTransform>().vel.y  = 0;
         m_player->getComponent<CInput>().canJump    = true;
+        m_player->getComponent<CTransform>().pos.y += distance;
         m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+
+        if (m_player->getComponent<CGroundSpeed>().grounded == false) {
+          m_player->getComponent<CGroundSpeed>().grounded = true;
+          m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+        }
+
+        if (m_player->getComponent<CState>().state == "Jumping") {
+          if (m_player->getComponent<CTransform>().vel.x != 0) {
+            m_player->getComponent<CState>().state = "Running";
+          } else {
+            m_player->getComponent<CState>().state = "Stand";
+          }
+        }
+      } else {
+        if (distance > 0) {
+          m_player->getComponent<CGroundSpeed>().grounded = false;
+          m_player->getComponent<CInput>().canJump        = false;
+        }
+
+        if (m_player->getComponent<CState>().state != "Jumping" && distance > 0 && distance <= 8) {
+          m_player->getComponent<CTransform>().vel.y  = 0;
+          m_player->getComponent<CInput>().canJump    = true;
+          m_player->getComponent<CTransform>().pos.y += distance;
+          m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+
+          if (m_player->getComponent<CGroundSpeed>().grounded == false) {
+            m_player->getComponent<CGroundSpeed>().grounded = true;
+            m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+          }
+
+          if (m_player->getComponent<CState>().state == "Jumping") {
+            if (m_player->getComponent<CTransform>().vel.x != 0) {
+              m_player->getComponent<CState>().state = "Running";
+            } else {
+              m_player->getComponent<CState>().state = "Stand";
+            }
+          }
+        }
       }
+    } else {
+      m_player->getComponent<CGroundSpeed>().grounded = false;
+      m_player->getComponent<CInput>().canJump        = false;
     }
 
-    if (
-      tile != nullptr &&
-      m_player->getComponent<CTransform>().vel.y == 0 &&
-      m_player->getComponent<CTransform>().vel.x == 0 &&
-      m_player->getComponent<CCollisionSensor>().bottom[0].mode == Sensor::Mode::floor &&
-      touching == 1
-    ) {
-      Vec2 sensor = m_player->getComponent<CTransform>().pos + Vec2(0, m_player->getComponent<CBoundingBox>().halfSize.y);
+    // if (
+    //   tile != nullptr &&
+    //   m_player->getComponent<CTransform>().vel.y == 0 &&
+    //   m_player->getComponent<CTransform>().vel.x == 0 &&
+    //   m_player->getComponent<CCollisionSensor>().bottom[0].mode == Sensor::Mode::floor &&
+    //   touching == 1
+    // ) {
+    //   Vec2 sensor = m_player->getComponent<CTransform>().pos + Vec2(0, m_player->getComponent<CBoundingBox>().halfSize.y);
       
-      if (side == 1 && m_player->getComponent<CTransform>().scale.x == -1) {
-        if (sensor.x < (tile->getComponent<CTransform>().pos.x - tile->getComponent<CBoundingBox>().halfSize.x)) {
-          m_player->getComponent<CState>().state = "Balancing";
-        }
-      } else if (side == -1 && m_player->getComponent<CTransform>().scale.x == 1) {
-        if (sensor.x > (tile->getComponent<CTransform>().pos.x + tile->getComponent<CBoundingBox>().halfSize.x)) {
-          m_player->getComponent<CState>().state = "Balancing";
-        }
-      }
-    }
+    //   if (side == 1 && m_player->getComponent<CTransform>().scale.x == -1) {
+    //     if (sensor.x < (tile->getComponent<CTransform>().pos.x - tile->getComponent<CBoundingBox>().halfSize.x)) {
+    //       m_player->getComponent<CState>().state = "Balancing";
+    //     }
+    //   } else if (side == -1 && m_player->getComponent<CTransform>().scale.x == 1) {
+    //     if (sensor.x > (tile->getComponent<CTransform>().pos.x + tile->getComponent<CBoundingBox>().halfSize.x)) {
+    //       m_player->getComponent<CState>().state = "Balancing";
+    //     }
+    //   }
+    // }
   }
 }
 
@@ -591,8 +723,8 @@ void Scene_Play::sRender () {
 void Scene_Play::update () {
   m_entities.update();
 
-  sGravity();
   sVelocity();
+  sGravity();
   sMovementX();
   sCollisionX();
   sMovementY();
