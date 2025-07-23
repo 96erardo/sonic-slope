@@ -7,7 +7,7 @@
 #include "Physics.h"
 
 struct PlayerConfig {
-  float X, Y, ACC, AIR_ACC, FRIC, DEC, MAXSPEED, JUMP, GRAVITY;
+  float X, Y, ACC, AIR_ACC, FRIC, DEC, MAXSPEED, SLOPE_FACTOR, JUMP, GRAVITY;
 };
 
 class Scene_Play: public Scene {

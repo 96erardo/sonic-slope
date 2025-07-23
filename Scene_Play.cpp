@@ -81,6 +81,7 @@ void Scene_Play::init(const std::string& path) {
         >> m_playerConfig.FRIC
         >> m_playerConfig.DEC
         >> m_playerConfig.MAXSPEED
+        >> m_playerConfig.SLOPE_FACTOR
         >> m_playerConfig.JUMP
         >> m_playerConfig.GRAVITY;
 
@@ -177,29 +178,31 @@ Vec2 Scene_Play::gridToMidPixel (float gridX, float gridY, Entity* entity) {
 }
 
 void Scene_Play::doAction (const Action& action) {
-  if (action.type() == "START") {
-    if (action.name() == "LEFT") {
-      m_player->getComponent<CInput>().left = true;
-    }
-    
-    if (action.name() == "RIGHT") {
-      m_player->getComponent<CInput>().right = true;
-    }
-
-    if (action.name() == "JUMP") {
-       m_player->getComponent<CInput>().jump = true;
-    }
-  } else if (action.type() == "END") {
-    if (action.name() == "LEFT") {
-      m_player->getComponent<CInput>().left = false;
-    }
-    
-    if (action.name() == "RIGHT") {
-      m_player->getComponent<CInput>().right = false;
-    }
-
-    if (action.name() == "JUMP") {
-      m_player->getComponent<CInput>().jump = false;
+  if (m_player->hasComponent<CInput>()) {
+    if (action.type() == "START") {
+      if (action.name() == "LEFT") {
+        m_player->getComponent<CInput>().left = true;
+      }
+      
+      if (action.name() == "RIGHT") {
+        m_player->getComponent<CInput>().right = true;
+      }
+  
+      if (action.name() == "JUMP") {
+         m_player->getComponent<CInput>().jump = true;
+      }
+    } else if (action.type() == "END") {
+      if (action.name() == "LEFT") {
+        m_player->getComponent<CInput>().left = false;
+      }
+      
+      if (action.name() == "RIGHT") {
+        m_player->getComponent<CInput>().right = false;
+      }
+  
+      if (action.name() == "JUMP") {
+        m_player->getComponent<CInput>().jump = false;
+      }
     }
   }
 }
@@ -325,6 +328,29 @@ void Scene_Play::sVelocity () {
   }    
     
   if (m_player->getComponent<CGroundSpeed>().grounded) {
+    if (m_player->getComponent<CTransform>().angle > 45 && m_player->getComponent<CTransform>().angle < 315) {
+      m_player->getComponent<CGroundSpeed>().speed -= m_playerConfig.SLOPE_FACTOR * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+
+      if (m_player->hasComponent<CInput>() && m_player->getComponent<CGroundSpeed>().speed < 2.5) {
+        m_player->removeComponent<CInput>();
+        m_player->getComponent<CGroundSpeed>().speed = -m_playerConfig.SLOPE_FACTOR * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));;
+      }
+    } else {
+      if (m_player->getComponent<CGroundSpeed>().speed > 0) {
+        m_player->getComponent<CGroundSpeed>().speed -= m_playerConfig.SLOPE_FACTOR * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+        m_player->getComponent<CGroundSpeed>().speed = std::max(m_player->getComponent<CGroundSpeed>().speed, 0.0f);
+
+      } else if (m_player->getComponent<CGroundSpeed>().speed < 0) {
+        m_player->getComponent<CGroundSpeed>().speed -= m_playerConfig.SLOPE_FACTOR * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+        m_player->getComponent<CGroundSpeed>().speed = std::min(m_player->getComponent<CGroundSpeed>().speed, 0.0f);
+      
+      } else {
+        if (m_player->hasComponent<CInput>() == false) {
+          m_player->addComponent<CInput>();
+        }
+      }
+    }
+
     m_player->getComponent<CTransform>().vel.x = m_player->getComponent<CGroundSpeed>().speed *  cosf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
     m_player->getComponent<CTransform>().vel.y = m_player->getComponent<CGroundSpeed>().speed * -sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
   }
