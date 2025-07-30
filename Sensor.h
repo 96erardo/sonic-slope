@@ -29,8 +29,9 @@ class Sensor {
     Sensor () {};
     Sensor (Vec2 f, Vec2 r, Vec2 l, Vec2 c, Direction d);
 
-    const Vec2& pos     () const;
-    void        setMode (int angle);
+    const Vec2&       pos     () const;
+    void              setMode (int angle);
+    Sensor::Direction getCurrentDirection () const;
 };
 
 #endif

@@ -32,7 +32,6 @@ Tile   Surface0 30  0   1   1   1
 Tile   Surface0 31  0   1   1   1
 Tile   Surface0 32  0   1   1   1
 
-Tile   Surface0  3   1   1   1   1
 Tile   Surface1  7   1   1   1   0
 Tile   Surface2  8   1   1   1   0
 Tile   Surface3  9   1   1   1   0
@@ -114,7 +113,7 @@ Tile   Surface0  23  6   1  -1   1
 Tile   Surface0  24  6   1  -1   1
 Tile   Surface0  25  6   1  -1   1
 Tile   Surface0  26  6   1  -1   1
-Tile   Surface16 35  6   1   1   0
+Tile   Surface0  35  6   1   1   1
 Tile   Surface0  36  6   1   1   1
 Tile   Surface0  37  6   1   1   1
 Tile   Surface0  38  6   1   1   1
@@ -142,4 +141,4 @@ Tile   Surface0 24  7   1  -1   1
 Tile   Surface0 25  7   1  -1   1
 Tile   Surface0 26  7   1  -1   1
 
-Player          0  1  0.05  0.1  4  0.75
+Player          0  1  0.0468 0.09375 0.0468  0.5  7 0.125 6.5 0.21875
