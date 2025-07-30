@@ -47,3 +47,18 @@ void Sensor::setMode (int angle) {
     }
   }
 }
+
+Sensor::Direction Sensor::getCurrentDirection () const {
+  switch (mode) {
+    case Sensor::Mode::floor:
+      return Sensor::Direction::bottom;
+    case Sensor::Mode::wLeft:
+      return Sensor::Direction::left;
+    case Sensor::Mode::wRight:
+      return Sensor::Direction::right;
+    case Sensor::Mode::ceiling:
+      return Sensor::Direction::top;
+    default:
+      return Sensor::Direction::bottom;
+  }
+}

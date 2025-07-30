@@ -20,6 +20,7 @@ class Physics {
     float   GetTileWidth              (const Vec2& sensor, Entity* tile) const;
     Entity* GetTileForSensor          (const Vec2& sensor, std::map<int, Entity*>& map, Sensor::Direction d);
     float   GetTileAngleForPlayer     (Entity* player, Entity* tile);
+    float   GetDistanceToTile         (const Vec2& sensor, Entity* tile, Sensor::Direction d) const;
     float   GetTileDistanceFromBottom (const Vec2& sensor, Entity* tile) const;
     float   GetTileDistanceFromTop    (const Vec2& sensor, Entity* tile) const;
     float   GetTileDistanceFromLeft   (const Vec2& sensor, Entity* tile) const;

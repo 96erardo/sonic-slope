@@ -216,8 +216,6 @@ void Scene_Play::sGravity () {
 }
 
 void Scene_Play::sVelocity () {
-  std::cout << m_player->getComponent<CTransform>().angle << " ";
-  std::cout << m_player->getComponent<CCollisionSensor>().bottom[0].mode << std::endl;
   m_player->getComponent<CCollisionSensor>().changeMode(m_player->getComponent<CTransform>().angle);
   m_player->getComponent<CTransform>().prevPos = m_player->getComponent<CTransform>().pos;
 
@@ -225,7 +223,7 @@ void Scene_Play::sVelocity () {
     if (m_player->getComponent<CGroundSpeed>().grounded) {
       m_player->getComponent<CState>().state = "Running";
 
-      if (m_player->getComponent<CTransform>().vel.x < 0) {
+      if (m_player->getComponent<CGroundSpeed>().speed < 0) {
         m_player->getComponent<CGroundSpeed>().speed = std::min(
           m_playerConfig.MAXSPEED,
           m_player->getComponent<CGroundSpeed>().speed + m_playerConfig.DEC
@@ -331,7 +329,7 @@ void Scene_Play::sVelocity () {
     if (m_player->getComponent<CTransform>().angle > 45 && m_player->getComponent<CTransform>().angle < 315) {
       m_player->getComponent<CGroundSpeed>().speed -= m_playerConfig.SLOPE_FACTOR * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
 
-      if (m_player->hasComponent<CInput>() && m_player->getComponent<CGroundSpeed>().speed < 2.5) {
+      if (m_player->hasComponent<CInput>() && abs(m_player->getComponent<CGroundSpeed>().speed) < 1) {
         m_player->removeComponent<CInput>();
         m_player->getComponent<CGroundSpeed>().speed = -m_playerConfig.SLOPE_FACTOR * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));;
       }
@@ -351,8 +349,8 @@ void Scene_Play::sVelocity () {
       }
     }
 
-    m_player->getComponent<CTransform>().vel.x = m_player->getComponent<CGroundSpeed>().speed *  cosf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
-    m_player->getComponent<CTransform>().vel.y = m_player->getComponent<CGroundSpeed>().speed * -sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+    m_player->getComponent<CTransform>().vel.x = m_player->getComponent<CGroundSpeed>().speed *  cos((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+    m_player->getComponent<CTransform>().vel.y = m_player->getComponent<CGroundSpeed>().speed * -sin((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
   }
 
   if (m_player->getComponent<CInput>().jump && m_player->getComponent<CInput>().canJump) {
@@ -361,6 +359,7 @@ void Scene_Play::sVelocity () {
     m_player->getComponent<CGroundSpeed>().grounded = false;
     m_player->getComponent<CTransform>().vel.x -= m_playerConfig.JUMP * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
     m_player->getComponent<CTransform>().vel.y -= m_playerConfig.JUMP * cosf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
+    m_player->getComponent<CTransform>().angle = 0;
   }
 }
 
@@ -389,7 +388,7 @@ void Scene_Play::sMovementX () {
 }
 
 void Scene_Play::sCollisionX () {
-  if (m_player->getComponent<CTransform>().vel.x > 0) {
+  if (m_player->getComponent<CCollisionSensor>().right.mode == Sensor::Mode::floor && m_player->getComponent<CTransform>().vel.x > 0) {
     Vec2 sensor    = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().right.pos();
     Entity* tile   = m_physics.GetTileForSensor(sensor, m_worldMap, Sensor::Direction::right);
 
@@ -399,12 +398,13 @@ void Scene_Play::sCollisionX () {
       if (distance < 0) {
         m_player->getComponent<CTransform>().pos.x += distance;
         m_player->getComponent<CTransform>().vel.x = 0;
+        m_player->getComponent<CGroundSpeed>().speed = 0;
         if (m_player->getComponent<CState>().state != "Jumping") {
           m_player->getComponent<CState>().state = "Pushing";
         }
       }
     }
-  } else if (m_player->getComponent<CTransform>().vel.x < 0) {
+  } else if (m_player->getComponent<CCollisionSensor>().left.mode == Sensor::Mode::floor && m_player->getComponent<CTransform>().vel.x < 0) {
     Vec2 sensor    = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().left.pos();
     Entity* tile   = m_physics.GetTileForSensor(sensor, m_worldMap, Sensor::Direction::left);
 
@@ -414,6 +414,7 @@ void Scene_Play::sCollisionX () {
       if (distance < 0) {
         m_player->getComponent<CTransform>().pos.x -= distance;
         m_player->getComponent<CTransform>().vel.x = 0;
+        m_player->getComponent<CGroundSpeed>().speed = 0;
         if (m_player->getComponent<CState>().state != "Jumping") {
           m_player->getComponent<CState>().state = "Pushing";
         }
@@ -421,16 +422,18 @@ void Scene_Play::sCollisionX () {
     }
   }
 
-  if (m_player->getComponent<CTransform>().vel.x != 0) {
+  {
+    Sensor::Direction direction;
     float distance = ((GRID_SIZE * 2) + 1);
     Entity* tile = nullptr;
   
     for (auto& b : m_player->getComponent<CCollisionSensor>().bottom) {
+      direction = b.getCurrentDirection();
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + b.pos();
-      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, Sensor::Direction::bottom);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, direction);
 
       if (entity != nullptr) {
-        float d = m_physics.GetTileDistanceFromBottom(sensor, entity);
+        float d = m_physics.GetDistanceToTile(sensor, entity, direction);
 
         if (d < distance) {
           distance = d;
@@ -441,19 +444,21 @@ void Scene_Play::sCollisionX () {
   
     if (tile != nullptr) {
       if (distance < 0) {
-        m_player->getComponent<CTransform>().vel.y  = 0;
-        m_player->getComponent<CInput>().canJump    = true;
-        m_player->getComponent<CTransform>().pos.y += distance;
-        m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+        if (direction == Sensor::Direction::bottom) {
+          m_player->getComponent<CTransform>().pos.y += distance;
 
-        if (m_player->getComponent<CGroundSpeed>().grounded == false) {
-          m_player->getComponent<CGroundSpeed>().grounded = true;
-          m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+        } else if (direction == Sensor::Direction::right) {
+          m_player->getComponent<CTransform>().pos.x += distance;
         }
+
+        m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+        m_player->getComponent<CInput>().canJump    = true;
+        m_player->getComponent<CGroundSpeed>().grounded = true;
 
         if (m_player->getComponent<CState>().state == "Jumping") {
           if (m_player->getComponent<CTransform>().vel.x != 0) {
             m_player->getComponent<CState>().state = "Running";
+            m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
           } else {
             m_player->getComponent<CState>().state = "Stand";
           }
@@ -462,26 +467,6 @@ void Scene_Play::sCollisionX () {
         if (distance > 0) {
           m_player->getComponent<CGroundSpeed>().grounded = false;
           m_player->getComponent<CInput>().canJump        = false;
-        }
-
-        if (m_player->getComponent<CState>().state != "Jumping" && distance > 0 && distance <= 8) {
-          m_player->getComponent<CTransform>().vel.y  = 0;
-          m_player->getComponent<CInput>().canJump    = true;
-          m_player->getComponent<CTransform>().pos.y += distance;
-          m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
-
-          if (m_player->getComponent<CGroundSpeed>().grounded == false) {
-            m_player->getComponent<CGroundSpeed>().grounded = true;
-            m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
-          }
-
-          if (m_player->getComponent<CState>().state == "Jumping") {
-            if (m_player->getComponent<CTransform>().vel.x != 0) {
-              m_player->getComponent<CState>().state = "Running";
-            } else {
-              m_player->getComponent<CState>().state = "Stand";
-            }
-          }
         }
       }
     } else {
@@ -521,51 +506,48 @@ void Scene_Play::sCollisionY () {
         }
       }
     }
-  } else if (m_player->getComponent<CTransform>().vel.y > 0) {
+  }
+  
+  {
     float distance = ((GRID_SIZE * 2) + 1);
     short int touching = 0;
     short int side = 0;
     Entity* tile = nullptr;
+    Sensor::Direction direction;
   
     for (auto& b : m_player->getComponent<CCollisionSensor>().bottom) {
+      direction      = b.getCurrentDirection(); 
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + b.pos();
-      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, Sensor::Direction::bottom);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, direction);
 
       if (entity != nullptr) {
-        float d = m_physics.GetTileDistanceFromBottom(sensor, entity);
-        
-        if (d < 0) {
-          touching++;
-        }
+        float d = m_physics.GetDistanceToTile(sensor, entity, direction);
 
         if (d < distance) {
           distance = d;
           tile = entity;
-
-          if (b.pos().x > 0) {
-            side = 1;
-          } else {
-            side = -1;
-          }
         }
       }
     }
   
     if (tile != nullptr) {
       if (distance < 0) {
-        m_player->getComponent<CTransform>().vel.y  = 0;
-        m_player->getComponent<CInput>().canJump    = true;
-        m_player->getComponent<CTransform>().pos.y += distance;
-        m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
-
-        if (m_player->getComponent<CGroundSpeed>().grounded == false) {
-          m_player->getComponent<CGroundSpeed>().grounded = true;
-          m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+        if (direction == Sensor::Direction::bottom) {
+          m_player->getComponent<CTransform>().pos.y += distance;
+        
+        } else if (direction == Sensor::Direction::right) {
+          m_player->getComponent<CTransform>().pos.x += distance;
         }
+
+        m_player->getComponent<CInput>().canJump    = true;
+        m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+        m_player->getComponent<CGroundSpeed>().grounded = true;
 
         if (m_player->getComponent<CState>().state == "Jumping") {
           if (m_player->getComponent<CTransform>().vel.x != 0) {
             m_player->getComponent<CState>().state = "Running";
+            m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+
           } else {
             m_player->getComponent<CState>().state = "Stand";
           }
@@ -577,49 +559,37 @@ void Scene_Play::sCollisionY () {
         }
 
         if (m_player->getComponent<CState>().state != "Jumping" && distance > 0 && distance <= 8) {
-          m_player->getComponent<CTransform>().vel.y  = 0;
-          m_player->getComponent<CInput>().canJump    = true;
-          m_player->getComponent<CTransform>().pos.y += distance;
-          m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
-
-          if (m_player->getComponent<CGroundSpeed>().grounded == false) {
-            m_player->getComponent<CGroundSpeed>().grounded = true;
-            m_player->getComponent<CGroundSpeed>().speed = m_player->getComponent<CTransform>().vel.x;
+          if (direction == Sensor::Direction::bottom) {
+            m_player->getComponent<CTransform>().pos.y += distance;
+          
+          } else if (direction == Sensor::Direction::right) {
+            m_player->getComponent<CTransform>().pos.x += distance;
           }
 
-          if (m_player->getComponent<CState>().state == "Jumping") {
-            if (m_player->getComponent<CTransform>().vel.x != 0) {
-              m_player->getComponent<CState>().state = "Running";
-            } else {
-              m_player->getComponent<CState>().state = "Stand";
-            }
+          m_player->getComponent<CInput>().canJump    = true;
+          m_player->getComponent<CGroundSpeed>().grounded = true;
+          m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
+        
+        } else if (m_player->getComponent<CState>().state != "Jumping" && distance > 0) {
+          if (m_player->getComponent<CTransform>().angle >= 180) {
+            m_player->getComponent<CTransform>().angle = std::min(m_player->getComponent<CTransform>().angle + 2.8125f, 360.0f);
+          } else {
+            m_player->getComponent<CTransform>().angle = std::min(m_player->getComponent<CTransform>().angle - 2.8125f, 0.0f);
           }
         }
       }
     } else {
       m_player->getComponent<CGroundSpeed>().grounded = false;
       m_player->getComponent<CInput>().canJump        = false;
-    }
 
-    // if (
-    //   tile != nullptr &&
-    //   m_player->getComponent<CTransform>().vel.y == 0 &&
-    //   m_player->getComponent<CTransform>().vel.x == 0 &&
-    //   m_player->getComponent<CCollisionSensor>().bottom[0].mode == Sensor::Mode::floor &&
-    //   touching == 1
-    // ) {
-    //   Vec2 sensor = m_player->getComponent<CTransform>().pos + Vec2(0, m_player->getComponent<CBoundingBox>().halfSize.y);
-      
-    //   if (side == 1 && m_player->getComponent<CTransform>().scale.x == -1) {
-    //     if (sensor.x < (tile->getComponent<CTransform>().pos.x - tile->getComponent<CBoundingBox>().halfSize.x)) {
-    //       m_player->getComponent<CState>().state = "Balancing";
-    //     }
-    //   } else if (side == -1 && m_player->getComponent<CTransform>().scale.x == 1) {
-    //     if (sensor.x > (tile->getComponent<CTransform>().pos.x + tile->getComponent<CBoundingBox>().halfSize.x)) {
-    //       m_player->getComponent<CState>().state = "Balancing";
-    //     }
-    //   }
-    // }
+      if (m_player->getComponent<CState>().state != "Jumping") {
+        if (m_player->getComponent<CTransform>().angle >= 180) {
+          m_player->getComponent<CTransform>().angle = std::min(m_player->getComponent<CTransform>().angle + 2.8125f, 360.0f);
+        } else {
+          m_player->getComponent<CTransform>().angle = std::max(m_player->getComponent<CTransform>().angle - 2.8125f, 0.0f);
+        }
+      }
+    }
   }
 }
 
