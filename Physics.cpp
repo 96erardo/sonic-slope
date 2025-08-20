@@ -126,7 +126,7 @@ float Physics::GetTileAngleForPlayer (Entity* player, Entity* tile) {
     return 360 - tile->getComponent<CBoundingBox>().angle;
   
   } else if (tile->getComponent<CTransform>().scale.x == 1 && tile->getComponent<CTransform>().scale.y == -1) {
-    return 270 - tile->getComponent<CBoundingBox>().angle;
+    return 180 + tile->getComponent<CBoundingBox>().angle;
   
   } else if (tile->getComponent<CTransform>().scale.x == -1 && tile->getComponent<CTransform>().scale.y == -1) {
     return 180 - tile->getComponent<CBoundingBox>().angle;

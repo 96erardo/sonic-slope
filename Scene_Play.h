@@ -15,7 +15,6 @@ class Scene_Play: public Scene {
   Entity*                          m_player;
   PlayerConfig                     m_playerConfig;
   Physics                          m_physics;
-  std::map<int, Entity*>           m_worldMap;
   float                            m_worldWidth = 0;
   float                            m_offset     = 0;
 
@@ -24,6 +23,7 @@ class Scene_Play: public Scene {
   void spawnBullet ();
   void spawnExplosion (Entity* entity);
   void spawnHitCoin (Entity* entity);
+  void flipLoop (Entity* tile);
   
   void sGravity ();
   void sVelocity ();

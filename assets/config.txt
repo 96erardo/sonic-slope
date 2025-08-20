@@ -23,6 +23,20 @@ Texture    TexSurface14    assets/images/tiles/surface-14.png
 Texture    TexSurface15    assets/images/tiles/surface-15.png
 Texture    TexSurface16    assets/images/tiles/surface-16.png
 Texture    TexSurface17    assets/images/tiles/surface-17.png
+Texture    TexSurface18    assets/images/tiles/surface-18.png
+Texture    TexSurface19    assets/images/tiles/surface-19.png
+Texture    TexSurface20    assets/images/tiles/surface-20.png
+Texture    TexSurface21    assets/images/tiles/surface-21.png
+Texture    TexSurface22    assets/images/tiles/surface-22.png
+Texture    TexSurface23    assets/images/tiles/surface-23.png
+Texture    TexSurface24    assets/images/tiles/surface-24.png
+Texture    TexSurface25    assets/images/tiles/surface-25.png
+Texture    TexSurface26    assets/images/tiles/surface-26.png
+Texture    TexSurface27    assets/images/tiles/surface-27.png
+Texture    TexSurface28    assets/images/tiles/surface-28.png
+Texture    TexSurface29    assets/images/tiles/surface-29.png
+Texture    TexSurface30    assets/images/tiles/surface-30.png
+Texture    TexSurface31    assets/images/tiles/surface-31.png
 Animation  Stand           TexStand      1     0      26     40
 Animation  Running         TexRun        6     10     26     40
 Animation  RunningFast     TexRunFast    4     8      26     40
@@ -48,3 +62,17 @@ Animation  Surface14       TexSurface14  1     0      32     32
 Animation  Surface15       TexSurface15  1     0      32     32
 Animation  Surface16       TexSurface16  1     0      32     32
 Animation  Surface17       TexSurface17  1     0      32     32
+Animation  Surface18       TexSurface18  1     0      32     32
+Animation  Surface19       TexSurface19  1     0      32     32
+Animation  Surface20       TexSurface20  1     0      32     32
+Animation  Surface21       TexSurface21  1     0      32     32
+Animation  Surface22       TexSurface22  1     0      32     32
+Animation  Surface23       TexSurface23  1     0      32     32
+Animation  Surface24       TexSurface24  1     0      32     32
+Animation  Surface25       TexSurface25  1     0      32     32
+Animation  Surface26       TexSurface26  1     0      32     32
+Animation  Surface27       TexSurface27  1     0      32     32
+Animation  Surface28       TexSurface28  1     0      32     32
+Animation  Surface29       TexSurface29  1     0      32     32
+Animation  Surface30       TexSurface30  1     0      32     32
+Animation  Surface31       TexSurface31  1     0      32     32

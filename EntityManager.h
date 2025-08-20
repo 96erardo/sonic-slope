@@ -12,8 +12,12 @@ class EntityManager {
   EntityVec                        m_entities;
   EntityVec                        m_toAdd;
   std::map<std::string, EntityVec> m_entityMap;
-
+  
   public:
+    std::map<int, Entity*>           m_worldPending;
+    std::map<int, Entity*>           m_worldAdd;
+    std::map<int, Entity*>           m_worldMap;
+    
     EntityManager();
 
     void init ();

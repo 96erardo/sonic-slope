@@ -55,6 +55,7 @@ class CBoundingBox: public Component {
   public:
     Vec2                size     = { 0,0 };
     Vec2                halfSize = { 0,0 };
+    bool                active = true;
     float               angle = 0;
     std::vector<int>    height;
     std::vector<int>    width;
