@@ -37,6 +37,18 @@ Texture    TexSurface28    assets/images/tiles/surface-28.png
 Texture    TexSurface29    assets/images/tiles/surface-29.png
 Texture    TexSurface30    assets/images/tiles/surface-30.png
 Texture    TexSurface31    assets/images/tiles/surface-31.png
+Texture    TexSurface40    assets/images/tiles/surface-40.png
+Texture    TexSurface41    assets/images/tiles/surface-41.png
+Texture    TexSurface42    assets/images/tiles/surface-42.png
+Texture    TexSurface43    assets/images/tiles/surface-43.png
+Texture    TexSurface44    assets/images/tiles/surface-44.png
+Texture    TexSurface45    assets/images/tiles/surface-45.png
+Texture    TexSurface46    assets/images/tiles/surface-46.png
+Texture    TexSurface47    assets/images/tiles/surface-47.png
+Texture    TexSurface48    assets/images/tiles/surface-48.png
+Texture    TexSurface49    assets/images/tiles/surface-49.png
+Texture    TexSurface50    assets/images/tiles/surface-50.png
+Texture    TexSurface51    assets/images/tiles/surface-51.png
 Animation  Stand           TexStand      1     0      26     40
 Animation  Running         TexRun        6     10     26     40
 Animation  RunningFast     TexRunFast    4     8      26     40
@@ -76,3 +88,15 @@ Animation  Surface28       TexSurface28  1     0      32     32
 Animation  Surface29       TexSurface29  1     0      32     32
 Animation  Surface30       TexSurface30  1     0      32     32
 Animation  Surface31       TexSurface31  1     0      32     32
+Animation  Surface40       TexSurface40  1     0      32     32
+Animation  Surface41       TexSurface41  1     0      32     32
+Animation  Surface42       TexSurface42  1     0      32     32
+Animation  Surface43       TexSurface43  1     0      32     32
+Animation  Surface44       TexSurface44  1     0      32     32
+Animation  Surface45       TexSurface45  1     0      32     32
+Animation  Surface46       TexSurface46  1     0      32     32
+Animation  Surface47       TexSurface47  1     0      32     32
+Animation  Surface48       TexSurface48  1     0      32     32
+Animation  Surface49       TexSurface49  1     0      32     32
+Animation  Surface50       TexSurface50  1     0      32     32
+Animation  Surface51       TexSurface51  1     0      32     32

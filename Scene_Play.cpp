@@ -28,8 +28,8 @@ void Scene_Play::init(const std::string& path) {
   while (file >> command) {
     if (command == "Tile" || command == "LoopTile") {
       std::string name;
-      unsigned int x, y, enabled = 1, angleFlag;
-      int scaleX, scaleY;
+      unsigned int x, y, angleFlag;
+      int scaleX, scaleY, enabled = 1;
       float a;
 
       if (command == "Tile") {
@@ -43,11 +43,10 @@ void Scene_Play::init(const std::string& path) {
 
       entity->addComponent<CAnimation>(*animation);
       entity->addComponent<CTransform>(gridToMidPixel(x, y, entity), Vec2(0,0), 0);
-      entity->addComponent<CBoundingBox>(animation->getBoundingBox().x, animation->getBoundingBox().y);
-
+      
       entity->getComponent<CTransform>().scale.x = scaleX;
       entity->getComponent<CTransform>().scale.y = scaleY;
-
+      
       if (enabled == 1) {
         m_entities.m_worldMap.insert_or_assign(genKey(x,y), entity);
       } else {
@@ -56,32 +55,36 @@ void Scene_Play::init(const std::string& path) {
       
       m_worldWidth = std::max((x * GRID_SIZE) + animation->getSize().x, m_worldWidth);
 
-      std::ifstream info("assets/images/tiles/" + name + ".txt");
-
-      while (info >> command) {
-        if (command == "a") {
-          if (angleFlag == 1) {
-            info >> a;
-            entity->getComponent<CBoundingBox>().angle = -1;
-          } else {
-            info >> a;
-            entity->getComponent<CBoundingBox>().angle = a;
-          }
-        } else if (command == "v") {
-          for (int i = 0; i < 32; i++) {
-            info >> y;
-
-            entity->getComponent<CBoundingBox>().height.push_back(y);
-          }
+      if (command == "Tile" || (command == "LoopTile" && enabled != -1)) {
+        std::ifstream info("assets/images/tiles/" + name + ".txt");
         
-        } else if (command == "h") {
-          for (int i = 0; i < 32; i++) {
-            info >> x;
-
-            entity->getComponent<CBoundingBox>().width.push_back(x);
+        entity->addComponent<CBoundingBox>(animation->getBoundingBox().x, animation->getBoundingBox().y);
+        
+        while (info >> command) {
+          if (command == "a") {
+            if (angleFlag == 1) {
+              info >> a;
+              entity->getComponent<CBoundingBox>().angle = -1;
+            } else {
+              info >> a;
+              entity->getComponent<CBoundingBox>().angle = a;
+            }
+          } else if (command == "v") {
+            for (int i = 0; i < 32; i++) {
+              info >> y;
+  
+              entity->getComponent<CBoundingBox>().height.push_back(y);
+            }
+          
+          } else if (command == "h") {
+            for (int i = 0; i < 32; i++) {
+              info >> x;
+  
+              entity->getComponent<CBoundingBox>().width.push_back(x);
+            }
           }
         }
-      }
+      }      
     } else if (command == "Player") {
       file >> m_playerConfig.X 
         >> m_playerConfig.Y 

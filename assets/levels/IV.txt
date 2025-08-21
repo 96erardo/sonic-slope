@@ -35,6 +35,21 @@ Tile   Surface0 33  0   1   1   1
 Tile   Surface0 34  0   1   1   1
 Tile   Surface0 35  0   1   1   1
 
+LoopTile -1 Surface45 8   6  1  1  0
+LoopTile -1 Surface48 8   5  1  1  0
+LoopTile -1 Surface49 8   4  1  1  0
+LoopTile -1 Surface49 8   3  1  1  0
+LoopTile -1 Surface47 8   2  1  1  0
+LoopTile -1 Surface50 9   1  1  1  0
+LoopTile -1 Surface40 9   6  1  1  0
+LoopTile -1 Surface40 14  6  1  1  0
+LoopTile -1 Surface41 15  6  1  1  0
+LoopTile -1 Surface42 15  5  1  1  0
+LoopTile -1 Surface42 15  4  1  1  0
+LoopTile -1 Surface43 15  3  1  1  0
+LoopTile -1 Surface44 15  2  1  1  0
+LoopTile -1 Surface44 14  1  1  1  0
+
 LoopTile 0 Surface30 10  1  -1   1   0
 LoopTile 0 Surface31 11  1  -1   1   0
 LoopTile 0 Surface19 12  1  -1   1   0
@@ -44,7 +59,7 @@ LoopTile 0 Surface29 10  2  -1   1   0
 LoopTile 0 Surface27 9   3  -1   1   0
 LoopTile 0 Surface24 9   4  -1  -1   0
 LoopTile 0 Surface22 10  5  -1  -1   0
-LoopTile 0 Surface23 9   5  -1  -1   0
+LoopTile 0 Surface51 9   5  -1  -1   0
 LoopTile 1 Surface26 11  6  -1  -1   0
 LoopTile 0 Surface25 10  6  -1  -1   0
 
@@ -56,7 +71,7 @@ LoopTile 1 Surface22 13  2   1   1   0
 LoopTile 1 Surface23 14  2   1   1   0
 LoopTile 1 Surface24 14  3   1   1   0
 LoopTile 1 Surface24 14  4   1  -1   0
-LoopTile 1 Surface23 14  5   1  -1   0
+LoopTile 1 Surface51 14  5   1  -1   0
 LoopTile 1 Surface22 13  5   1  -1   0
 LoopTile 1 Surface25 13  6   1  -1   0
 LoopTile 1 Surface26 12  6   1  -1   0
