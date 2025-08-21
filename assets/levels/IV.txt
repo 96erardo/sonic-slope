@@ -1,0 +1,79 @@
+Tile   Surface0 0   0   1   1   1
+Tile   Surface0 1   0   1   1   1
+Tile   Surface0 2   0   1   1   1
+Tile   Surface0 3   0   1   1   1
+Tile   Surface0 4   0   1   1   1
+Tile   Surface0 5   0   1   1   1
+Tile   Surface0 6   0   1   1   1
+Tile   Surface0 7   0   1   1   1
+Tile   Surface0 8   0   1   1   1
+Tile   Surface0 9   0   1   1   1
+Tile   Surface0 10  0   1   1   1
+Tile   Surface0 11  0   1   1   1
+Tile   Surface0 12  0   1   1   1
+Tile   Surface0 13  0   1   1   1
+Tile   Surface0 14  0   1   1   1
+Tile   Surface0 15  0   1   1   1
+Tile   Surface0 16  0   1   1   1
+Tile   Surface0 17  0   1   1   1
+Tile   Surface0 18  0   1   1   1
+Tile   Surface0 19  0   1   1   1
+Tile   Surface0 20  0   1   1   1
+Tile   Surface0 21  0   1   1   1
+Tile   Surface0 22  0   1   1   1
+Tile   Surface0 23  0   1   1   1
+Tile   Surface0 24  0   1   1   1
+Tile   Surface0 25  0   1   1   1
+Tile   Surface0 26  0   1   1   1
+Tile   Surface0 27  0   1   1   1
+Tile   Surface0 28  0   1   1   1
+Tile   Surface0 29  0   1   1   1
+Tile   Surface0 30  0   1   1   1
+Tile   Surface0 31  0   1   1   1
+Tile   Surface0 32  0   1   1   1
+Tile   Surface0 33  0   1   1   1
+Tile   Surface0 34  0   1   1   1
+Tile   Surface0 35  0   1   1   1
+
+LoopTile -1 Surface45 8   6  1  1  0
+LoopTile -1 Surface48 8   5  1  1  0
+LoopTile -1 Surface49 8   4  1  1  0
+LoopTile -1 Surface49 8   3  1  1  0
+LoopTile -1 Surface47 8   2  1  1  0
+LoopTile -1 Surface50 9   1  1  1  0
+LoopTile -1 Surface40 9   6  1  1  0
+LoopTile -1 Surface40 14  6  1  1  0
+LoopTile -1 Surface41 15  6  1  1  0
+LoopTile -1 Surface42 15  5  1  1  0
+LoopTile -1 Surface42 15  4  1  1  0
+LoopTile -1 Surface43 15  3  1  1  0
+LoopTile -1 Surface44 15  2  1  1  0
+LoopTile -1 Surface44 14  1  1  1  0
+
+LoopTile 0 Surface30 10  1  -1   1   0
+LoopTile 0 Surface31 11  1  -1   1   0
+LoopTile 0 Surface19 12  1  -1   1   0
+LoopTile 0 Surface18 13  1  -1   1   0
+LoopTile 0 Surface28 9   2  -1   1   0
+LoopTile 0 Surface29 10  2  -1   1   0
+LoopTile 0 Surface27 9   3  -1   1   0
+LoopTile 0 Surface24 9   4  -1  -1   0
+LoopTile 0 Surface22 10  5  -1  -1   0
+LoopTile 0 Surface51 9   5  -1  -1   0
+LoopTile 1 Surface26 11  6  -1  -1   0
+LoopTile 0 Surface25 10  6  -1  -1   0
+
+LoopTile 1 Surface18 10  1   1   1   0
+LoopTile 1 Surface19 11  1   1   1   0
+LoopTile 1 Surface20 12  1   1   1   0
+LoopTile 1 Surface21 13  1   1   1   0
+LoopTile 1 Surface22 13  2   1   1   0
+LoopTile 1 Surface23 14  2   1   1   0
+LoopTile 1 Surface24 14  3   1   1   0
+LoopTile 1 Surface24 14  4   1  -1   0
+LoopTile 1 Surface51 14  5   1  -1   0
+LoopTile 1 Surface22 13  5   1  -1   0
+LoopTile 1 Surface25 13  6   1  -1   0
+LoopTile 1 Surface26 12  6   1  -1   0
+
+Player 0  1  0.0468  0.09375  0.0468  0.5  7  0.125  6.5  0.21875

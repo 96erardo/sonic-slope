@@ -26,53 +26,65 @@ void Scene_Play::init(const std::string& path) {
   std::ifstream file(path);
 
   while (file >> command) {
-    if (command == "Tile") {
+    if (command == "Tile" || command == "LoopTile") {
       std::string name;
       unsigned int x, y, angleFlag;
-      int scaleX, scaleY;
+      int scaleX, scaleY, enabled = 1;
       float a;
 
-      file >> name >> x >> y >> scaleX >> scaleY >> angleFlag;
+      if (command == "Tile") {
+        file >> name >> x >> y >> scaleX >> scaleY >> angleFlag;
+      } else {
+        file >> enabled >> name >> x >> y >> scaleX >> scaleY >> angleFlag;
+      }
 
       auto entity = m_entities.addEntity("Tile");
       auto animation = m_game->assets().getAnimation(name);
 
       entity->addComponent<CAnimation>(*animation);
       entity->addComponent<CTransform>(gridToMidPixel(x, y, entity), Vec2(0,0), 0);
-      entity->addComponent<CBoundingBox>(animation->getBoundingBox().x, animation->getBoundingBox().y);
-
+      
       entity->getComponent<CTransform>().scale.x = scaleX;
       entity->getComponent<CTransform>().scale.y = scaleY;
-
-      m_worldMap.insert_or_assign(genKey(x,y), entity);
+      
+      if (enabled == 1) {
+        m_entities.m_worldMap.insert_or_assign(genKey(x,y), entity);
+      } else {
+        m_entities.m_worldPending.insert_or_assign(genKey(x, y), entity);
+      }
+      
       m_worldWidth = std::max((x * GRID_SIZE) + animation->getSize().x, m_worldWidth);
 
-      std::ifstream info("assets/images/tiles/" + name + ".txt");
-
-      while (info >> command) {
-        if (command == "a") {
-          if (angleFlag == 1) {
-            info >> a;
-            entity->getComponent<CBoundingBox>().angle = -1;
-          } else {
-            info >> a;
-            entity->getComponent<CBoundingBox>().angle = a;
-          }
-        } else if (command == "v") {
-          for (int i = 0; i < 32; i++) {
-            info >> y;
-
-            entity->getComponent<CBoundingBox>().height.push_back(y);
-          }
+      if (command == "Tile" || (command == "LoopTile" && enabled != -1)) {
+        std::ifstream info("assets/images/tiles/" + name + ".txt");
         
-        } else if (command == "h") {
-          for (int i = 0; i < 32; i++) {
-            info >> x;
-
-            entity->getComponent<CBoundingBox>().width.push_back(x);
+        entity->addComponent<CBoundingBox>(animation->getBoundingBox().x, animation->getBoundingBox().y);
+        
+        while (info >> command) {
+          if (command == "a") {
+            if (angleFlag == 1) {
+              info >> a;
+              entity->getComponent<CBoundingBox>().angle = -1;
+            } else {
+              info >> a;
+              entity->getComponent<CBoundingBox>().angle = a;
+            }
+          } else if (command == "v") {
+            for (int i = 0; i < 32; i++) {
+              info >> y;
+  
+              entity->getComponent<CBoundingBox>().height.push_back(y);
+            }
+          
+          } else if (command == "h") {
+            for (int i = 0; i < 32; i++) {
+              info >> x;
+  
+              entity->getComponent<CBoundingBox>().width.push_back(x);
+            }
           }
         }
-      }
+      }      
     } else if (command == "Player") {
       file >> m_playerConfig.X 
         >> m_playerConfig.Y 
@@ -261,7 +273,7 @@ void Scene_Play::sVelocity () {
     if (m_player->getComponent<CGroundSpeed>().grounded) {
       m_player->getComponent<CState>().state = "Running";
 
-      if (m_player->getComponent<CTransform>().vel.x > 0) {
+      if (m_player->getComponent<CGroundSpeed>().speed > 0) {
         m_player->getComponent<CGroundSpeed>().speed = std::max(
           -m_playerConfig.MAXSPEED,
           m_player->getComponent<CGroundSpeed>().speed - m_playerConfig.DEC
@@ -390,7 +402,7 @@ void Scene_Play::sMovementX () {
 void Scene_Play::sCollisionX () {
   if (m_player->getComponent<CCollisionSensor>().right.mode == Sensor::Mode::floor && m_player->getComponent<CTransform>().vel.x > 0) {
     Vec2 sensor    = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().right.pos();
-    Entity* tile   = m_physics.GetTileForSensor(sensor, m_worldMap, Sensor::Direction::right);
+    Entity* tile   = m_physics.GetTileForSensor(sensor, m_entities.m_worldMap, Sensor::Direction::right);
 
     if (tile != nullptr) {
       float distance = m_physics.GetTileDistanceFromRight(sensor, tile); 
@@ -406,7 +418,7 @@ void Scene_Play::sCollisionX () {
     }
   } else if (m_player->getComponent<CCollisionSensor>().left.mode == Sensor::Mode::floor && m_player->getComponent<CTransform>().vel.x < 0) {
     Vec2 sensor    = m_player->getComponent<CTransform>().pos + m_player->getComponent<CCollisionSensor>().left.pos();
-    Entity* tile   = m_physics.GetTileForSensor(sensor, m_worldMap, Sensor::Direction::left);
+    Entity* tile   = m_physics.GetTileForSensor(sensor, m_entities.m_worldMap, Sensor::Direction::left);
 
     if (tile != nullptr) {
       float distance = m_physics.GetTileDistanceFromLeft(sensor, tile); 
@@ -430,7 +442,7 @@ void Scene_Play::sCollisionX () {
     for (auto& b : m_player->getComponent<CCollisionSensor>().bottom) {
       direction = b.getCurrentDirection();
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + b.pos();
-      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, direction);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_entities.m_worldMap, direction);
 
       if (entity != nullptr) {
         float d = m_physics.GetDistanceToTile(sensor, entity, direction);
@@ -449,6 +461,12 @@ void Scene_Play::sCollisionX () {
 
         } else if (direction == Sensor::Direction::right) {
           m_player->getComponent<CTransform>().pos.x += distance;
+        
+        } else if (direction == Sensor::Direction::top) {
+          m_player->getComponent<CTransform>().pos.y -= distance;
+        
+        } else {
+          m_player->getComponent<CTransform>().pos.x -= distance;
         }
 
         m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
@@ -473,6 +491,12 @@ void Scene_Play::sCollisionX () {
       m_player->getComponent<CGroundSpeed>().grounded = false;
       m_player->getComponent<CInput>().canJump        = false;
     }
+
+    if (m_player->getComponent<CGroundSpeed>().grounded && tile != nullptr) {
+      if (tile->getComponent<CAnimation>().animation.getName() == "Surface26") {
+
+      }
+    }
   }
 }
 
@@ -487,7 +511,7 @@ void Scene_Play::sCollisionY () {
 
     for (auto& t : m_player->getComponent<CCollisionSensor>().top) {
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + t.pos();
-      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, Sensor::Direction::top);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_entities.m_worldMap, Sensor::Direction::top);
 
       if (entity != nullptr) {
         float d = m_physics.GetTileDistanceFromTop(sensor, entity);
@@ -518,7 +542,7 @@ void Scene_Play::sCollisionY () {
     for (auto& b : m_player->getComponent<CCollisionSensor>().bottom) {
       direction      = b.getCurrentDirection(); 
       Vec2 sensor    = m_player->getComponent<CTransform>().pos + b.pos();
-      Entity* entity = m_physics.GetTileForSensor(sensor, m_worldMap, direction);
+      Entity* entity = m_physics.GetTileForSensor(sensor, m_entities.m_worldMap, direction);
 
       if (entity != nullptr) {
         float d = m_physics.GetDistanceToTile(sensor, entity, direction);
@@ -537,6 +561,12 @@ void Scene_Play::sCollisionY () {
         
         } else if (direction == Sensor::Direction::right) {
           m_player->getComponent<CTransform>().pos.x += distance;
+        
+        } else if (direction == Sensor::Direction::top) {
+          m_player->getComponent<CTransform>().pos.y -= distance;
+        
+        } else {
+          m_player->getComponent<CTransform>().pos.x -= distance;
         }
 
         m_player->getComponent<CInput>().canJump    = true;
@@ -587,6 +617,90 @@ void Scene_Play::sCollisionY () {
           m_player->getComponent<CTransform>().angle = std::min(m_player->getComponent<CTransform>().angle + 2.8125f, 360.0f);
         } else {
           m_player->getComponent<CTransform>().angle = std::max(m_player->getComponent<CTransform>().angle - 2.8125f, 0.0f);
+        }
+      }
+    }
+
+    if (m_player->getComponent<CGroundSpeed>().grounded && tile != nullptr) {
+      if (
+        tile->getComponent<CAnimation>().animation.getName() == "Surface26" && 
+        tile->getComponent<CBoundingBox>().active &&
+        tile->getComponent<CTransform>().scale.x == 1 &&
+        m_player->getComponent<CTransform>().vel.x < 0
+      ) {
+        Vec2 pos = pixelToGridPosition(tile->getComponent<CTransform>().pos);
+        tile->getComponent<CBoundingBox>().active = false;
+        m_entities.m_worldMap.at(genKey(pos.x - 1, pos.y))->getComponent<CBoundingBox>().active = true;
+
+        for (int y = 0; y >= -5; --y) {
+          for (int x = -4; x <= -2; ++x) {
+            int key = genKey(pos.x + x, pos.y + y);
+            
+            if (m_entities.m_worldPending.find(key) != m_entities.m_worldPending.end()) {
+              m_entities.m_worldAdd.insert_or_assign(key, m_entities.m_worldPending.at(key));
+              m_entities.m_worldPending.erase(key);
+            }
+          }
+        }
+        
+        for (int x = -1; x <= 1; ++x) {
+          int key = genKey(pos.x + x, pos.y - 5);
+            
+          if (m_entities.m_worldPending.find(key) != m_entities.m_worldPending.end()) {
+            m_entities.m_worldAdd.insert_or_assign(key, m_entities.m_worldPending.at(key));
+            m_entities.m_worldPending.erase(key);
+          }
+        }
+
+        for (int y = 0; y >= -5; --y) {
+          for (int x = 1; x <= 3; ++x) {
+            int key = genKey(pos.x + x, pos.y + y);
+            
+            if (m_entities.m_worldMap.find(key) != m_entities.m_worldMap.end()) {
+              m_entities.m_worldPending.insert_or_assign(key, m_entities.m_worldMap.at(key));
+              m_entities.m_worldMap.erase(key);
+            }
+          }
+        }
+      } else if (
+        tile->getComponent<CAnimation>().animation.getName() == "Surface26" && 
+        tile->getComponent<CBoundingBox>().active &&
+        tile->getComponent<CTransform>().scale.x == -1 &&
+        m_player->getComponent<CTransform>().vel.x > 0
+      ) {
+        Vec2 pos = pixelToGridPosition(tile->getComponent<CTransform>().pos);
+        tile->getComponent<CBoundingBox>().active = false;
+        m_entities.m_worldMap.at(genKey(pos.x + 1, pos.y))->getComponent<CBoundingBox>().active = true;
+
+        for (int y = 0; y >= -5; --y) {
+          for (int x = 1; x <= 3; ++x) {
+            int key = genKey(pos.x + x, pos.y + y);
+            
+            if (m_entities.m_worldPending.find(key) != m_entities.m_worldPending.end()) {
+              m_entities.m_worldAdd.insert_or_assign(key, m_entities.m_worldPending.at(key));
+              m_entities.m_worldPending.erase(key);
+            }
+          }
+        }
+        
+        for (int x = 0; x >= -2; --x) {
+          int key = genKey(pos.x + x, pos.y - 5);
+            
+          if (m_entities.m_worldPending.find(key) != m_entities.m_worldPending.end()) {
+            m_entities.m_worldAdd.insert_or_assign(key, m_entities.m_worldPending.at(key));
+            m_entities.m_worldPending.erase(key);
+          }
+        }
+
+        for (int y = 0; y >= -5; --y) {
+          for (int x = -4; x <= -2; ++x) {
+            int key = genKey(pos.x + x, pos.y + y);
+            
+            if (m_entities.m_worldMap.find(key) != m_entities.m_worldMap.end()) {
+              m_entities.m_worldPending.insert_or_assign(key, m_entities.m_worldMap.at(key));
+              m_entities.m_worldMap.erase(key);
+            }
+          }
         }
       }
     }

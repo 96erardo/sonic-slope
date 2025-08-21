@@ -37,6 +37,15 @@ void EntityManager::update () {
     m_entityMap[add->tag()].push_back(add);
   }
 
+  for (auto it = m_worldAdd.begin(); it != m_worldAdd.end(); ++it) {
+    if (m_worldMap.find(it->first) != m_worldMap.end()) {
+      m_worldPending.insert_or_assign(it->first, m_worldMap.at(it->first));
+    }
+
+    m_worldMap.insert_or_assign(it->first, it->second);
+  }
+
+  m_worldAdd.clear();
   m_toAdd.clear();
 }
 
