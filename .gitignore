@@ -3,3 +3,19 @@
 *.dSYM/*
 main
 .DS_Store
+
+dependencies/
+
+# Visual Studio build files
+Debug/
+Release/
+x64/
+x86/
+
+# User-specific files
+*.user
+*.suo
+*.vcxproj.user
+
+# IDE metadata
+.vs/
