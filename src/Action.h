@@ -12,8 +12,6 @@ class Action {
 
     const std::string& name() const;
     const std::string& type() const;
-
-    void toString () const;
 };
 
 #endif

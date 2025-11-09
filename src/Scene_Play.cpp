@@ -12,6 +12,9 @@
 #include "Components.h"
 #include "GameEngine.h"
 #include "Scene_Play.h"
+#include "JumpCommand.h"
+#include "LeftCommand.h"
+#include "RightCommand.h"
 
 Scene_Play::Scene_Play (GameEngine* g, const std::string& path) {
   m_game = g;
@@ -102,6 +105,10 @@ void Scene_Play::init(const std::string& path) {
         spawnPlayer();
     }
   }
+
+  jump      = new JumpCommand(m_player, m_playerConfig.JUMP);
+  moveLeft  = new LeftCommand(m_player, m_playerConfig.ACC, m_playerConfig.DEC, m_playerConfig.AIR_ACC,  m_playerConfig.MAXSPEED);
+  moveRight = new RightCommand(m_player, m_playerConfig.ACC, m_playerConfig.DEC, m_playerConfig.AIR_ACC, m_playerConfig.MAXSPEED);
 }
 
 void Scene_Play::spawnPlayer () {
@@ -191,7 +198,7 @@ Vec2 Scene_Play::gridToMidPixel (float gridX, float gridY, Entity* entity) {
   return Vec2(x, y);
 }
 
-void Scene_Play::doAction (const Action& action) {
+void Scene_Play::doAction (const Action& action) { 
   if (m_player->hasComponent<CInput>()) {
     if (action.type() == "START") {
       if (action.name() == "LEFT") {
@@ -203,7 +210,7 @@ void Scene_Play::doAction (const Action& action) {
       }
   
       if (action.name() == "JUMP") {
-         m_player->getComponent<CInput>().jump = true;
+        jump->execute();
       }
     } else if (action.type() == "END") {
       if (action.name() == "LEFT") {
@@ -231,85 +238,14 @@ void Scene_Play::sGravity () {
 
 void Scene_Play::sVelocity () {
   m_player->getComponent<CCollisionSensor>().changeMode(m_player->getComponent<CTransform>().angle);
-  m_player->getComponent<CTransform>().prevPos = m_player->getComponent<CTransform>().pos;
 
   if (m_player->getComponent<CInput>().right) {
-    if (m_player->getComponent<CGroundSpeed>().grounded) {
-      m_player->getComponent<CState>().state = "Running";
-
-      if (m_player->getComponent<CGroundSpeed>().speed < 0) {
-        m_player->getComponent<CGroundSpeed>().speed = std::min(
-          m_playerConfig.MAXSPEED,
-          m_player->getComponent<CGroundSpeed>().speed + m_playerConfig.DEC
-        );
-  
-        m_player->getComponent<CState>().state = "Stopping";
-  
-      } else {
-        m_player->getComponent<CGroundSpeed>().speed = std::min(
-          m_playerConfig.MAXSPEED,
-          m_player->getComponent<CGroundSpeed>().speed + m_playerConfig.ACC
-        );
-  
-        m_player->getComponent<CTransform>().scale = Vec2(1, 1);
-  
-        if (abs(m_player->getComponent<CGroundSpeed>().speed) > (m_playerConfig.MAXSPEED / 2)) {
-          m_player->getComponent<CState>().state = "RunningFast";
-        }
-      }
-    } else {
-      m_player->getComponent<CTransform>().vel.x = std::min(
-        m_playerConfig.MAXSPEED,
-        m_player->getComponent<CTransform>().vel.x + m_playerConfig.AIR_ACC
-      );
-
-      m_player->getComponent<CTransform>().scale = Vec2(1, 1);
-
-      if (m_player->getComponent<CState>().state != "Jumping") {
-        if (abs(m_player->getComponent<CTransform>().vel.x) > (m_playerConfig.MAXSPEED / 2)) {
-          m_player->getComponent<CState>().state = "RunningFast";
-        }
-      }
-    }
-  } else if (m_player->getComponent<CInput>().left) {
-    if (m_player->getComponent<CGroundSpeed>().grounded) {
-      m_player->getComponent<CState>().state = "Running";
-
-      if (m_player->getComponent<CGroundSpeed>().speed > 0) {
-        m_player->getComponent<CGroundSpeed>().speed = std::max(
-          -m_playerConfig.MAXSPEED,
-          m_player->getComponent<CGroundSpeed>().speed - m_playerConfig.DEC
-        );
-  
-        m_player->getComponent<CState>().state = "Stopping";
-  
-      } else {
-        m_player->getComponent<CGroundSpeed>().speed = std::max(
-          -m_playerConfig.MAXSPEED,
-          m_player->getComponent<CGroundSpeed>().speed - m_playerConfig.ACC
-        );
-  
-        m_player->getComponent<CTransform>().scale = Vec2(-1, 1);
-  
-        if (abs(m_player->getComponent<CGroundSpeed>().speed) > (m_playerConfig.MAXSPEED / 2)) {
-          m_player->getComponent<CState>().state = "RunningFast";
-        }
-      }
-    } else {
-      m_player->getComponent<CTransform>().vel.x = std::max(
-        -m_playerConfig.MAXSPEED,
-        m_player->getComponent<CTransform>().vel.x - m_playerConfig.AIR_ACC
-      );
-
-      m_player->getComponent<CTransform>().scale = Vec2(-1, 1);
-
-      if (m_player->getComponent<CState>().state != "Jumping") {
-        if (abs(m_player->getComponent<CTransform>().vel.x) > (m_playerConfig.MAXSPEED / 2)) {
-          m_player->getComponent<CState>().state = "RunningFast";
-        }
-      }
-    }    
-  } else {
+      moveRight->execute();
+  } 
+  else if  (m_player->getComponent<CInput>().left) {
+      moveLeft->execute();
+  } 
+  else {
     if (m_player->getComponent<CGroundSpeed>().speed != 0) {
       if (m_player->getComponent<CGroundSpeed>().grounded) {
         if (m_player->getComponent<CGroundSpeed>().speed > 0) {
@@ -365,15 +301,6 @@ void Scene_Play::sVelocity () {
 
     m_player->getComponent<CTransform>().vel.x = m_player->getComponent<CGroundSpeed>().speed *  cos((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
     m_player->getComponent<CTransform>().vel.y = m_player->getComponent<CGroundSpeed>().speed * -sin((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
-  }
-
-  if (m_player->getComponent<CInput>().jump && m_player->getComponent<CInput>().canJump) {
-    m_player->getComponent<CInput>().canJump = false;
-    m_player->getComponent<CState>().state = "Jumping";
-    m_player->getComponent<CGroundSpeed>().grounded = false;
-    m_player->getComponent<CTransform>().vel.x -= m_playerConfig.JUMP * sinf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
-    m_player->getComponent<CTransform>().vel.y -= m_playerConfig.JUMP * cosf((360 - m_player->getComponent<CTransform>().angle) * (M_PI/180));
-    m_player->getComponent<CTransform>().angle = 0;
   }
 }
 
@@ -472,7 +399,6 @@ void Scene_Play::sCollisionX () {
         }
 
         m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
-        m_player->getComponent<CInput>().canJump    = true;
         m_player->getComponent<CGroundSpeed>().grounded = true;
 
         if (m_player->getComponent<CState>().state == "Jumping") {
@@ -486,12 +412,10 @@ void Scene_Play::sCollisionX () {
       } else {
         if (distance > 0) {
           m_player->getComponent<CGroundSpeed>().grounded = false;
-          m_player->getComponent<CInput>().canJump        = false;
         }
       }
     } else {
       m_player->getComponent<CGroundSpeed>().grounded = false;
-      m_player->getComponent<CInput>().canJump        = false;
     }
 
     if (m_player->getComponent<CGroundSpeed>().grounded && tile != nullptr) {
@@ -528,7 +452,7 @@ void Scene_Play::sCollisionY () {
         if (distance < 0) {
           m_player->getComponent<CTransform>().pos.y -= distance;
           m_player->getComponent<CTransform>().vel.y  = 0;
-          m_player->getComponent<CInput>().canJump    = false;
+          m_player->getComponent<CGroundSpeed>().grounded = false;
         }
       }
     }
@@ -571,7 +495,6 @@ void Scene_Play::sCollisionY () {
           m_player->getComponent<CTransform>().pos.x -= distance;
         }
 
-        m_player->getComponent<CInput>().canJump    = true;
         m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
         m_player->getComponent<CGroundSpeed>().grounded = true;
 
@@ -587,7 +510,6 @@ void Scene_Play::sCollisionY () {
       } else {
         if (distance > 0) {
           m_player->getComponent<CGroundSpeed>().grounded = false;
-          m_player->getComponent<CInput>().canJump        = false;
         }
 
         if (m_player->getComponent<CState>().state != "Jumping" && distance > 0 && distance <= 8) {
@@ -598,7 +520,6 @@ void Scene_Play::sCollisionY () {
             m_player->getComponent<CTransform>().pos.x += distance;
           }
 
-          m_player->getComponent<CInput>().canJump    = true;
           m_player->getComponent<CGroundSpeed>().grounded = true;
           m_player->getComponent<CTransform>().angle  = m_physics.GetTileAngleForPlayer(m_player, tile);
         
@@ -612,7 +533,6 @@ void Scene_Play::sCollisionY () {
       }
     } else {
       m_player->getComponent<CGroundSpeed>().grounded = false;
-      m_player->getComponent<CInput>().canJump        = false;
 
       if (m_player->getComponent<CState>().state != "Jumping") {
         if (m_player->getComponent<CTransform>().angle >= 180) {
@@ -844,4 +764,10 @@ void Scene_Play::update () {
   sState();
   sAnimation();
   sRender();
+}
+
+Scene_Play::~Scene_Play() {
+    delete jump;
+    delete moveLeft;
+    delete moveRight;
 }

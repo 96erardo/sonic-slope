@@ -16,7 +16,7 @@ class CTransform: public Component {
     Vec2  prevPos = { 0,0 };
     Vec2  vel     = { 0,0 };
     Vec2  scale   = { 1,1 };
-    int   angle   = 0;
+    int   angle   = 0; 
 
     CTransform () {};
     CTransform (const Vec2& p, const Vec2& v, int a):
@@ -95,7 +95,6 @@ class CInput: public Component {
     bool left = false;
     bool right = false;
     bool jump = false;
-    bool canJump = false;
 
     CInput () {};
 };

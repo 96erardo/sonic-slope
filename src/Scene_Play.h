@@ -4,6 +4,7 @@
 #include "Vec2.h"
 #include "Scene.h"
 #include "Entity.h"
+#include "Command.h"
 #include "Physics.h"
 
 struct PlayerConfig {
@@ -11,19 +12,19 @@ struct PlayerConfig {
 };
 
 class Scene_Play: public Scene {
-  sf::Color                        m_background;
-  Entity*                          m_player;
-  PlayerConfig                     m_playerConfig;
-  Physics                          m_physics;
-  float                            m_worldWidth = 0;
-  float                            m_offset     = 0;
+  sf::Color    m_background;
+  Entity*      m_player;
+  PlayerConfig m_playerConfig;
+  Physics      m_physics;
+  float        m_worldWidth = 0;
+  float        m_offset     = 0;
+
+  Command*     jump;
+  Command*     moveLeft;
+  Command*     moveRight;
 
   void init (const std::string& path) override;
   void spawnPlayer ();
-  void spawnBullet ();
-  void spawnExplosion (Entity* entity);
-  void spawnHitCoin (Entity* entity);
-  void flipLoop (Entity* tile);
   
   void sGravity ();
   void sVelocity ();
@@ -31,7 +32,6 @@ class Scene_Play: public Scene {
   void sCollisionX ();
   void sMovementY ();
   void sCollisionY ();
-  void sLifespan ();
   void sState ();
   void sAnimation ();
   void sRender () override;
@@ -40,6 +40,7 @@ class Scene_Play: public Scene {
 
   public:
     Scene_Play(GameEngine* g, const std::string& path);
+    ~Scene_Play();
     
     void update () override;
     void doAction (const Action& action) override;

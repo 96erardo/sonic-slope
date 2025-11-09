@@ -25,9 +25,9 @@ class Scene {
     virtual ~Scene() = default;
 
     virtual void update () = 0;
+    virtual void doAction (const Action& action) = 0;
 
     const ActionMap& getActionMap () const;
-    virtual void doAction (const Action& action) = 0;
     void registerAction (sf::Keyboard::Key code, const std::string& name);
 };
 
